@@ -1,5 +1,22 @@
 # Changelog
 
+UsageDeck's own releases. Versions are independent of OpenUsage: this line starts at v0.1.0.
+OpenUsage's release history is preserved below for the code this fork is built on.
+
+## Unreleased
+
+### New Features
+- Show every signed-in Claude account, not just the default home. UsageDeck now discovers
+  `~/.claude` and each `~/.claude-<name>` sibling and gives every account its own card, its own
+  credential and its own spend.
+
+---
+
+# OpenUsage history
+
+The releases below are OpenUsage's, by Robin Ebers and its contributors, and describe the upstream
+project rather than UsageDeck. They are kept because this fork is built on that work.
+
 ## v0.7.10
 
 ### New Features

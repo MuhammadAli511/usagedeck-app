@@ -24,9 +24,36 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-: "${CODESIGN_IDENTITY:?set CODESIGN_IDENTITY to your Developer ID Application identity}"
-: "${ICLOUD_PROVISIONING_PROFILE:?set ICLOUD_PROVISIONING_PROFILE to the iCloud provisioning profile path}"
-: "${SPARKLE_PUBLIC_KEY:?set SPARKLE_PUBLIC_KEY to your base64 EdDSA public key}"
+# Signing and provisioning both degrade instead of aborting, so a release can be cut before the
+# Apple Developer Program membership and iCloud container exist, and upgrades to a fully signed,
+# notarized build the moment those secrets are present. Nothing about the build changes otherwise.
+CODESIGN_IDENTITY="${CODESIGN_IDENTITY:--}"
+if [ "$CODESIGN_IDENTITY" = "-" ]; then
+  # An ad-hoc signature cannot carry a hardened runtime or a secure timestamp, and cannot be
+  # notarized, so Gatekeeper will refuse the build on any Mac but this one.
+  HARDENED=""
+  echo "WARNING: no CODESIGN_IDENTITY set - signing ad-hoc." >&2
+  echo "         Other Macs will refuse to open this build. Set a Developer ID Application" >&2
+  echo "         identity to produce a distributable release." >&2
+else
+  HARDENED="--options runtime --timestamp"
+fi
+
+if [ -n "${ICLOUD_PROVISIONING_PROFILE:-}" ]; then
+  PROVISIONED=1
+else
+  PROVISIONED=0
+  echo "WARNING: no ICLOUD_PROVISIONING_PROFILE set - building without iCloud Sync." >&2
+  echo "         Everything else works; usage history just will not sync between Macs." >&2
+fi
+# Without a Sparkle key pair the build ships with no update feed at all, rather than a feed it
+# cannot verify: UpdaterController disables itself when SUFeedURL is absent, which is the safe state.
+UPDATABLE=1
+if [ -z "${SPARKLE_PUBLIC_KEY:-}" ]; then
+  UPDATABLE=0
+  echo "WARNING: no SPARKLE_PUBLIC_KEY set - building with auto-updates disabled." >&2
+  echo "         Generate an EdDSA key pair to enable them (see docs/releasing.md)." >&2
+fi
 : "${USAGEDECK_VERSION:?set USAGEDECK_VERSION, e.g. 0.7.0}"
 
 APP_NAME="UsageDeck"
@@ -62,7 +89,9 @@ ENTITLEMENTS="$DIST_DIR/UsageDeck.release.resolved.entitlements.plist"
 # opt out with ALLOW_UNNOTARIZED=1 (the build will then be Gatekeeper-blocked on other Macs). Missing
 # creds without that opt-out is a hard error so CI never publishes an un-notarized DMG.
 NOTARIZE=0
-if [ -n "${NOTARY_APPLE_ID:-}" ] && [ -n "${NOTARY_APP_PASSWORD:-}" ] && [ -n "${NOTARY_TEAM_ID:-}" ]; then
+if [ "$CODESIGN_IDENTITY" = "-" ]; then
+  echo "Skipping notarization: an ad-hoc signed build cannot be notarized." >&2
+elif [ -n "${NOTARY_APPLE_ID:-}" ] && [ -n "${NOTARY_APP_PASSWORD:-}" ] && [ -n "${NOTARY_TEAM_ID:-}" ]; then
   NOTARIZE=1
 elif [ "${ALLOW_UNNOTARIZED:-}" = "1" ]; then
   echo "WARNING: ALLOW_UNNOTARIZED=1 — build will NOT be notarized (other Macs will block it)." >&2
@@ -166,6 +195,12 @@ else
     --output-partial-info-plist /dev/null --output-format human-readable-text --errors --warnings
 fi
 
+SPARKLE_PLIST_KEYS=""
+if [ "$UPDATABLE" = "1" ]; then
+  SPARKLE_PLIST_KEYS="  <key>SUFeedURL</key><string>$FEED_URL</string>
+  <key>SUPublicEDKey</key><string>$SPARKLE_PUBLIC_KEY</string>"
+fi
+
 cat >"$APP_CONTENTS/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -184,8 +219,7 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
   <key>LSUIElement</key><true/>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>
-  <key>SUFeedURL</key><string>$FEED_URL</string>
-  <key>SUPublicEDKey</key><string>$SPARKLE_PUBLIC_KEY</string>
+$SPARKLE_PLIST_KEYS
   <key>SUEnableAutomaticChecks</key><true/>
   <key>SUScheduledCheckInterval</key><integer>3600</integer>
   <key>NSUbiquitousContainers</key>
@@ -201,22 +235,29 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
 </plist>
 PLIST
 
-cp "$ICLOUD_PROVISIONING_PROFILE" "$APP_CONTENTS/embedded.provisionprofile"
-"$ROOT_DIR/script/render_icloud_entitlements.sh" \
-  "$ENTITLEMENTS_TEMPLATE" "$ICLOUD_PROVISIONING_PROFILE" "$ENTITLEMENTS" \
-  "iCloud.org.vantaso.usagedeck"
+ENTITLEMENTS_ARGS=""
+if [ "$PROVISIONED" = "1" ]; then
+  cp "$ICLOUD_PROVISIONING_PROFILE" "$APP_CONTENTS/embedded.provisionprofile"
+  "$ROOT_DIR/script/render_icloud_entitlements.sh" \
+    "$ENTITLEMENTS_TEMPLATE" "$ICLOUD_PROVISIONING_PROFILE" "$ENTITLEMENTS" \
+    "iCloud.org.vantaso.usagedeck"
+  ENTITLEMENTS_ARGS="--entitlements $ENTITLEMENTS"
+fi
 
 # Embed + sign Sparkle (Developer ID, hardened runtime, secure timestamp).
-"$ROOT_DIR/script/embed_sparkle.sh" "$APP_BUNDLE" "$APP_BINARY" "$CODESIGN_IDENTITY" "--options runtime --timestamp"
-codesign --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" "$CLI_BINARY"
+"$ROOT_DIR/script/embed_sparkle.sh" "$APP_BUNDLE" "$APP_BINARY" "$CODESIGN_IDENTITY" "$HARDENED"
+# shellcheck disable=SC2086 # $HARDENED is zero or two distinct arguments
+codesign --force $HARDENED --sign "$CODESIGN_IDENTITY" "$CLI_BINARY"
 
 echo "==> signing app (Developer ID, hardened runtime)"
 # Not --deep: the Sparkle framework is signed above and must keep that signature.
-codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" \
-  --sign "$CODESIGN_IDENTITY" "$APP_BUNDLE"
+# shellcheck disable=SC2086 # $HARDENED and $ENTITLEMENTS_ARGS are zero or more distinct arguments
+codesign --force $HARDENED $ENTITLEMENTS_ARGS --sign "$CODESIGN_IDENTITY" "$APP_BUNDLE"
 codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
-codesign -d --entitlements :- "$APP_BUNDLE" 2>&1 | grep -q "iCloud.org.vantaso.usagedeck" \
-  || { echo "signed app is missing the production iCloud entitlement" >&2; exit 1; }
+if [ "$PROVISIONED" = "1" ]; then
+  codesign -d --entitlements :- "$APP_BUNDLE" 2>&1 | grep -q "iCloud.org.vantaso.usagedeck" \
+    || { echo "signed app is missing the production iCloud entitlement" >&2; exit 1; }
+fi
 
 # Notarize + staple the app itself (not just the DMG) so it launches cleanly even offline after a
 # Sparkle update extracts it from the disk image.
@@ -236,7 +277,8 @@ ln -s /Applications "$STAGE/Applications"
 rm -f "$DMG_PATH"
 hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO "$DMG_PATH" >/dev/null
 rm -rf "$STAGE"
-codesign --force --timestamp --sign "$CODESIGN_IDENTITY" "$DMG_PATH"
+# shellcheck disable=SC2086 # $HARDENED is zero or two distinct arguments
+codesign --force $HARDENED --sign "$CODESIGN_IDENTITY" "$DMG_PATH"
 
 # Notarize + staple the DMG too, so the first manual download isn't Gatekeeper-blocked.
 if [ "$NOTARIZE" = "1" ]; then

@@ -91,39 +91,15 @@ Mac whose `actool` predates the regression.
 
 ## Releasing
 
-Pushing a `v*` tag on `main` builds, signs, notarizes and publishes. A plain tag (`v0.7.1`) ships to
-everyone; a pre-release suffix (`v0.7.1-beta.1`) ships to the beta channel. The pipeline is
-[.github/workflows/release.yml](.github/workflows/release.yml).
+UsageDeck ships from tags: pushing a `v*` tag on `main` builds a universal binary, signs it, and
+publishes a DMG to GitHub Releases. Versions start at **v0.1.0** and are independent of OpenUsage's.
 
-**Releases are not yet configured for this fork.** All of the following repository secrets are
-inherited placeholders and must be set to this project's own credentials before a release can ship:
+The pipeline degrades rather than blocking. A release cut today produces a working, ad-hoc signed
+DMG; adding the Apple and Sparkle credentials later upgrades the same pipeline to a signed,
+notarized, auto-updating build with no other change.
 
-| Secret | What it is |
-| --- | --- |
-| `APPLE_CERTIFICATE` | base64 of the Developer ID Application `.p12` |
-| `APPLE_CERTIFICATE_PASSWORD` | password set when exporting that `.p12` |
-| `APPLE_ID` | Apple ID email used for notarization |
-| `APPLE_PASSWORD` | app-specific password for that Apple ID |
-| `APPLE_TEAM_ID` | Apple Developer team ID |
-| `APPLE_DEVELOPER_ID_ICLOUD_PROFILE` | base64 Developer ID provisioning profile for the production iCloud container |
-| `SPARKLE_PUBLIC_KEY` | base64 EdDSA public key, baked in as `SUPublicEDKey` |
-| `SPARKLE_PRIVATE_KEY` | base64 EdDSA private key used to sign the DMG |
-| `POSTHOG_CLI_API_KEY` | PostHog personal API key, for uploading dSYMs (optional) |
-| `POSTHOG_CLI_PROJECT_ID` | numeric PostHog project ID (optional) |
-
-Three further one-time steps are outstanding:
-
-1. **iCloud container.** Create `iCloud.org.vantaso.usagedeck` (and `.dev`) under your Apple
-   Developer team and install the development provisioning profile. Until then the dev build warns
-   and runs with iCloud Sync disabled. See [iCloud Sync](docs/icloud-sync.md).
-2. **Sparkle keypair.** Generate once with Sparkle's `generate_keys`, then set both halves as
-   secrets. They must be a matching pair or signing is silently skipped.
-3. **Telemetry.** `Sources/OpenUsage/Services/Telemetry.swift` carries the placeholder
-   `phc_REPLACE_ME`. Set your own PostHog project token, or leave the placeholder and telemetry
-   stays off. Never restore upstream's token.
-
-GitHub Pages must serve the `gh-pages` branch for the Sparkle appcast, and this repository must stay
-public so Sparkle can fetch the appcast and DMG anonymously.
+Distribution to other Macs needs a paid Apple Developer Program membership, which is not yet set up.
+Full runbook, the state of every credential, and how to cut a release: [docs/releasing.md](docs/releasing.md).
 
 ## Architecture
 
