@@ -4,7 +4,7 @@
 <dict>
   <key>com.apple.developer.icloud-container-identifiers</key>
   <array>
-    <string>iCloud.com.robinebers.openusage</string>
+    <string>iCloud.org.vantaso.usagedeck.dev</string>
   </array>
   <key>com.apple.developer.icloud-services</key>
   <array>
@@ -12,7 +12,9 @@
   </array>
   <key>com.apple.developer.ubiquity-container-identifiers</key>
   <array>
-    <string>$(TeamIdentifierPrefix)iCloud.com.robinebers.openusage</string>
+    <string>$(TeamIdentifierPrefix)iCloud.org.vantaso.usagedeck.dev</string>
   </array>
+  <key>com.apple.security.get-task-allow</key>
+  <true/>
 </dict>
 </plist>

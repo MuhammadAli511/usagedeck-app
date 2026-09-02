@@ -7,8 +7,8 @@ let package = Package(
         .macOS(.v15)
     ],
     products: [
-        .executable(name: "OpenUsage", targets: ["OpenUsageApp"]),
-        .executable(name: "openusage-cli", targets: ["OpenUsageCLI"])
+        .executable(name: "UsageDeck", targets: ["OpenUsageApp"]),
+        .executable(name: "usagedeck-cli", targets: ["OpenUsageCLI"])
     ],
     dependencies: [
         // The de-facto standard recorder + global hotkey for Mac apps (System Settings-style field).

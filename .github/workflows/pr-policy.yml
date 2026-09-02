@@ -97,10 +97,10 @@ jobs:
             };
 
             if (!approvedIssue) {
-              const marker = "<!-- openusage:approved-issue-required -->";
+              const marker = "<!-- usagedeck:approved-issue-required -->";
               const body = [
                 marker,
-                "Thanks for your interest in contributing to OpenUsage!",
+                "Thanks for your interest in contributing to UsageDeck!",
                 "",
                 "External pull requests must reference an **open issue** that:",
                 "",
@@ -156,7 +156,7 @@ jobs:
               return;
             }
 
-            const marker = "<!-- openusage:large-pr-warning -->";
+            const marker = "<!-- usagedeck:large-pr-warning -->";
 
             if (await findBotComment(marker)) {
               return;

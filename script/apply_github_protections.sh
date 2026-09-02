@@ -2,14 +2,14 @@
 set -euo pipefail
 
 # Applies the branch/tag protections this repo uses on GitHub, mirroring
-# robinebers/openusage. GitHub gates these features on private repos
+# MuhammadAli511/usagedeck-app. GitHub gates these features on private repos
 # (free plan), so run this once after the repo goes public:
 #
 #   ./script/apply_github_protections.sh
 #
 # Requires: gh CLI authenticated as a repo admin.
 
-REPO="${REPO:-robinebers/openusage}"
+REPO="${REPO:-MuhammadAli511/usagedeck-app}"
 
 # No visibility pre-check: a private repo on a paid plan supports these
 # settings, so let GitHub be the judge and surface its error if not.
