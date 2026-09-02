@@ -21,6 +21,9 @@ import Foundation
 /// the cheap dedup + day aggregation over cached entries before local model-rate estimates.
 actor ClaudeLogUsageScanner {
     private let environment: EnvironmentReading
+    /// Pins this scanner to one Claude config directory, so a per-account runtime reads only
+    /// its own `projects/` logs. `nil` keeps the environment-driven behaviour.
+    private let configDir: String?
     private let homeDirectory: @Sendable () -> URL
     private let scanner: IncrementalJSONLScanner<Entry>
     /// Scoped provider instances pass their stable parse-source identity here. Account or time filters
@@ -66,10 +69,12 @@ actor ClaudeLogUsageScanner {
         cacheIdentityOverride: String? = nil,
         accountUUID: String? = nil,
         organizationUUID: String? = nil,
-        allowsUnattributedSessions: Bool = false
+        allowsUnattributedSessions: Bool = false,
+        configDir: String? = nil
     ) {
         precondition(cacheIdentityOverride?.isEmpty != true)
         self.environment = environment
+        self.configDir = configDir?.nilIfEmpty
         self.homeDirectory = homeDirectory
         self.scanner = incrementalScanner ?? Self.sharedScanner
         self.cacheIdentityOverride = cacheIdentityOverride
@@ -121,7 +126,7 @@ actor ClaudeLogUsageScanner {
         if let cacheIdentityOverride { return cacheIdentityOverride }
         let home = homeDirectory().resolvingSymlinksInPath().path
         let configuredRoots: [URL]
-        if let raw = environment.value(for: "CLAUDE_CONFIG_DIR")?
+        if let raw = (configDir ?? environment.value(for: "CLAUDE_CONFIG_DIR"))?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !raw.isEmpty
         {
@@ -166,7 +171,7 @@ actor ClaudeLogUsageScanner {
             roots.append(url)
         }
 
-        if let raw = environment.value(for: "CLAUDE_CONFIG_DIR")?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let raw = (configDir ?? environment.value(for: "CLAUDE_CONFIG_DIR"))?.trimmingCharacters(in: .whitespacesAndNewlines),
            !raw.isEmpty {
             for part in raw.split(separator: ",").map({ $0.trimmingCharacters(in: .whitespaces) }) where !part.isEmpty {
                 var url = URL(fileURLWithPath: expandHome(part))

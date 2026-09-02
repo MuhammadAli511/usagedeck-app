@@ -45,6 +45,31 @@ A `CLAUDE_CODE_OAUTH_TOKEN` — usually a long-lived `claude setup-token` — ca
 
 If one source holds an expired or "locked out" token, UsageDeck falls back to the others — so signing in again with `claude` outside the app is picked up on the next refresh, without restarting UsageDeck. Claude Code tokens are refreshed automatically; rotated tokens are written back only while the ordered login candidates still match the start of the refresh, so a newly added higher-priority login wins. Claude Desktop tokens are never refreshed or written by UsageDeck.
 
+## Multiple accounts
+
+UsageDeck shows every Claude account you are signed into, each as its own card with its own limits
+and spend.
+
+Claude Code keeps a separate account in each config directory, selected with `CLAUDE_CONFIG_DIR`.
+UsageDeck looks at `~/.claude` and every `~/.claude-<name>` sibling, and treats a directory as an
+account when the keychain holds that directory's credential (Claude Code stores it under
+`Claude Code-credentials-<8 hex of SHA256 of the absolute path>`). Directories that are not
+accounts, such as a worktrees folder or a dated backup, have no such item and are skipped, so
+nothing needs to be configured or excluded by hand.
+
+Cards are named after the account's organization, falling back to the directory name: `~/.claude-beaj`
+reads "Claude · Beaj". The default home is always plain "Claude". An organization name that Claude
+generated automatically ("someone@example.com's Organization") is ignored in favour of the directory
+name, since it is longer and less recognisable.
+
+Two directories signed into the same account produce **one** card, not two: accounts are identified
+by their account and organization UUIDs, never by their path, so the same subscription is never
+counted twice. A directory whose `.claude.json` does not name an account is skipped rather than
+guessed at.
+
+Each account refreshes with its own credential and reads spend only from its own `projects/` logs.
+An account with no local logs yet shows its limits with no spend, which is not an error.
+
 ## The spend tiles
 
 Today / Yesterday / Last 30 Days are computed **locally**: UsageDeck reads the Claude Code session logs under `~/.claude/projects/` (or `$CLAUDE_CONFIG_DIR`) itself — no external tools needed. Symlinks are followed, so a projects folder linked into a synced location (say, a Dropbox folder) is read all the same. With one known account, Claude usage from the [pi](https://github.com/earendil-works/pi) coding agent counts too: UsageDeck reads pi's session logs under `~/.pi/agent/sessions/` (or `$PI_CODING_AGENT_SESSION_DIR`) and folds any Claude usage there into the same tiles and trend, so a Claude sub driven through pi still shows up here. pi records its own per-message cost, so those dollars come straight from pi rather than being re-estimated. Cowork (the Claude desktop app's agent mode) counts too: it writes the same logs into per-session folders under `~/Library/Application Support/Claude/local-agent-mode-sessions/`, and UsageDeck scans those as well, so desktop agent sessions show up in the tiles alongside terminal ones. Persisted `claude -p` runs count as well. Runs made with `--no-session-persistence` cannot appear because Claude deliberately writes no session log for UsageDeck to read. Advisor work recorded inside a message is counted once under the advisor's own model; the parent's main-model totals are kept separate, and ordinary iteration details are not counted again. A log's recorded fast or standard speed controls its price; UsageDeck does not infer speed from the event date. Days are grouped in your Mac's local time zone, so they line up with your own calendar. Each period is one tile showing cost and tokens together (`$4.08 · 1.2M tokens`); a day with no usage reads **No data** rather than a misleading `$0.00 · 0 tokens` — the same as every other spend-tracking provider. The live Session and Weekly meters are unaffected. The dollars are estimated from token counts at API rates (that's the ⓘ) using the shared [model pricing](../pricing.md); the token counts themselves are measured. No log data leaves your Mac.

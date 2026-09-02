@@ -173,6 +173,10 @@ struct ClaudeAuthStore: Sendable {
     let expectedIdentityKey: String?
     let desktopOnly: Bool
     let preferOrganizationScopedDesktop: Bool
+    /// The Claude config directory this store reads. `nil` means "resolve the default home from the
+    /// environment"; a value pins the store to one discovered `~/.claude-<name>`, which is what keeps
+    /// each account reading its own keychain item and its own credential file.
+    let configDir: String?
 
     init(
         environment: EnvironmentReading = ProcessEnvironmentReader(),
@@ -183,6 +187,7 @@ struct ClaudeAuthStore: Sendable {
         expectedIdentityKey: String? = nil,
         desktopOnly: Bool = false,
         preferOrganizationScopedDesktop: Bool = false,
+        configDir: String? = nil,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
         self.environment = environment
@@ -193,6 +198,7 @@ struct ClaudeAuthStore: Sendable {
         self.expectedIdentityKey = expectedIdentityKey?.lowercased()
         self.desktopOnly = desktopOnly
         self.preferOrganizationScopedDesktop = preferOrganizationScopedDesktop
+        self.configDir = configDir?.nilIfEmpty
         self.now = now
     }
 
@@ -334,7 +340,7 @@ struct ClaudeAuthStore: Sendable {
     }
 
     func claudeHomeOverride() -> String? {
-        envText("CLAUDE_CONFIG_DIR")
+        configDir ?? envText("CLAUDE_CONFIG_DIR")
     }
 
     // Resolved OAuth endpoint strings before URL validation. The suffix is derived from the same
@@ -489,7 +495,9 @@ struct ClaudeAuthStore: Sendable {
     }
 
     private func credentialsPath() -> String {
-        "\(envText("CLAUDE_CONFIG_DIR") ?? Self.defaultClaudeHome)/\(Self.credentialFileName)"
+        // Via claudeHomeOverride so an account pinned to a config directory reads ITS credential
+        // file, not the default home's.
+        "\(claudeHomeOverride() ?? Self.defaultClaudeHome)/\(Self.credentialFileName)"
     }
 
     private func envText(_ name: String) -> String? {

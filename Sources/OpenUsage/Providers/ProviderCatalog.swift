@@ -20,7 +20,8 @@ enum ProviderCatalog {
                 let user = identity.split(separator: "|").first.map(String.init)
                 let scanner = ClaudeLogUsageScanner(
                     accountUUID: user, organizationUUID: card.organizationID,
-                    allowsUnattributedSessions: card.allowsUnattributedPiUsage
+                    allowsUnattributedSessions: card.allowsUnattributedPiUsage,
+                    configDir: card.configDir
                 )
                 return ClaudeProvider(
                     provider: ClaudeProvider.makeProvider(
@@ -31,7 +32,8 @@ enum ProviderCatalog {
                         desktopOrganization: card.organizationID,
                         expectedIdentityKey: identity,
                         desktopOnly: card.usesDesktopCredentials,
-                        preferOrganizationScopedDesktop: claudeCards.count > 1 && !card.usesDesktopCredentials
+                        preferOrganizationScopedDesktop: claudeCards.count > 1 && !card.usesDesktopCredentials,
+                        configDir: card.configDir
                     ),
                     logUsageScanner: scanner,
                     allowsUnattributedPiUsage: card.allowsUnattributedPiUsage

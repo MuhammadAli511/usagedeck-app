@@ -30,6 +30,9 @@ struct ProviderAccountSource: Codable, Equatable, Sendable {
     enum Kind: String, Codable, Sendable {
         /// The provider's standard home for this machine (`~/.claude`, `~/.codex`, env override).
         case defaultHome
+        /// A non-default Claude config directory (`~/.claude-beaj`), discovered by
+        /// `ClaudeConfigDirDiscovery` and signed in under its own keychain credential.
+        case configDir
     }
 
     var kind: Kind
