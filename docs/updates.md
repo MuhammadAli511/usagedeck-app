@@ -1,7 +1,7 @@
 # Updates
 
-OpenUsage keeps itself up to date using [Sparkle](https://sparkle-project.org), the standard update
-framework for Mac apps. Updates are downloaded from OpenUsage's own release feed and verified before
+UsageDeck keeps itself up to date using [Sparkle](https://sparkle-project.org), the standard update
+framework for Mac apps. Updates are downloaded from UsageDeck's own release feed and verified before
 they install, so you always get a genuine, unmodified build.
 
 ## How it works
@@ -12,8 +12,8 @@ they install, so you always get a genuine, unmodified build.
   notes, download, install) front and center. The banner's close button snoozes it; it comes back the
   next time the app finds the update.
 - **Manual check.** Open **Settings → Updates** and click **Check for Updates…** at any time.
-  For both manual checks and banner installs, OpenUsage brings itself to the foreground before opening
-  Sparkle so the update window doesn't get buried behind another app. Because OpenUsage normally lives
+  For both manual checks and banner installs, UsageDeck brings itself to the foreground before opening
+  Sparkle so the update window doesn't get buried behind another app. Because UsageDeck normally lives
   only in the menu bar, it briefly shows a Dock icon for the update session, then hides again.
 - **Turn it off.** The **Update Automatically** switch in **Settings → Updates** stops the
   background checks. You can still check manually.
@@ -28,8 +28,8 @@ Everyone always receives stable releases — the beta option only *adds* pre-rel
 
 ## Where updates come from
 
-Update builds are published on OpenUsage's GitHub releases, and the list of available versions (the
-"appcast") is served from `https://robinebers.github.io/openusage/appcast.xml`. Each download is
-signed two ways — Apple notarization plus OpenUsage's own signature — and the app refuses anything that
+Update builds are published on UsageDeck's GitHub releases, and the list of available versions (the
+"appcast") is served from `https://muhammadali511.github.io/usagedeck-app/appcast.xml`. Each download is
+signed two ways — Apple notarization plus UsageDeck's own signature — and the app refuses anything that
 doesn't match. This is only available in the official signed release build, not in local developer
 builds.

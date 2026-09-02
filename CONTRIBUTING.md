@@ -1,10 +1,10 @@
-# Contributing to OpenUsage
+# Contributing to UsageDeck
 
-OpenUsage accepts contributions through a strict, issue-first workflow, and the quality bar is deliberately high. **By design, most external pull requests are closed** — automation closes any that don't follow the rules below. Read this entire document before opening a PR.
+UsageDeck accepts contributions through a strict, issue-first workflow, and the quality bar is deliberately high. **By design, most external pull requests are closed** — automation closes any that don't follow the rules below. Read this entire document before opening a PR.
 
 ## Philosophy
 
-OpenUsage is highly opinionated. It focuses on clean design, fast performance, and a great user experience. The feature set is intentionally limited to core functionality: tracking AI coding subscription usage, nothing more. Contributions that try to expand that scope, add unnecessary complexity, or compromise the UX will be closed.
+UsageDeck is highly opinionated. It focuses on clean design, fast performance, and a great user experience. The feature set is intentionally limited to core functionality: tracking AI coding subscription usage, nothing more. Contributions that try to expand that scope, add unnecessary complexity, or compromise the UX will be closed.
 
 If you're unsure whether your idea fits, open an issue first. External pull requests without a linked, maintainer-approved issue assigned to their author are closed automatically — without review.
 
@@ -17,7 +17,7 @@ If you're unsure whether your idea fits, open an issue first. External pull requ
 - Test your changes. If it touches UI, include before/after screenshots.
 - Keep it simple. Don't over-engineer.
 - One PR per concern. Don't bundle unrelated changes.
-- Match the existing design language. OpenUsage has a specific look and feel — [AGENTS.md](AGENTS.md) documents the display conventions.
+- Match the existing design language. UsageDeck has a specific look and feel — [AGENTS.md](AGENTS.md) documents the display conventions.
 
 ## Pull Request Policy
 
@@ -48,17 +48,17 @@ By submitting a pull request, you agree that your contribution is licensed under
 
 ### Add a provider
 
-Each provider is a small Swift module under `Sources/OpenUsage/Providers/<Name>/` that conforms to `ProviderRuntime`: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into metric lines. See [docs/adding-a-provider.md](docs/adding-a-provider.md) for the full walkthrough (and [docs/architecture.md](docs/architecture.md) for how the pieces fit together).
+Each provider is a small Swift module under `Sources/UsageDeck/Providers/<Name>/` that conforms to `ProviderRuntime`: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into metric lines. See [docs/adding-a-provider.md](docs/adding-a-provider.md) for the full walkthrough (and [docs/architecture.md](docs/architecture.md) for how the pieces fit together).
 
 1. Open or comment on an issue and wait for a maintainer to approve it (`approved` label) and assign it to you — include why the provider fits and how its usage data is accessible
-2. Create `Sources/OpenUsage/Providers/<Name>/` and implement `ProviderRuntime`
+2. Create `Sources/UsageDeck/Providers/<Name>/` and implement `ProviderRuntime`
 3. Register the provider in `AppContainer`
-4. Add focused tests under `Tests/OpenUsageTests/`
+4. Add focused tests under `Tests/UsageDeckTests/`
 5. Add a provider page in `docs/providers/` (metrics, credential sources, endpoints, troubleshooting)
 6. Test it locally with `./script/build_and_run.sh`
 7. Open a PR with screenshots showing it working
 
-You can also [open an issue](https://github.com/robinebers/openusage/issues/new?template=new_provider.yml) to request a provider without building it yourself.
+You can also [open an issue](https://github.com/MuhammadAli511/usagedeck-app/issues/new?template=new_provider.yml) to request a provider without building it yourself.
 
 ### Fix a bug
 
@@ -69,7 +69,7 @@ You can also [open an issue](https://github.com/robinebers/openusage/issues/new?
 
 ### Request a feature
 
-Don't open a PR for a feature without an approved issue assigned to you first. [Open an issue](https://github.com/robinebers/openusage/issues/new?template=feature_request.yml), make your case, and wait for a maintainer to add the `approved` label and assign it to you.
+Don't open a PR for a feature without an approved issue assigned to you first. [Open an issue](https://github.com/MuhammadAli511/usagedeck-app/issues/new?template=feature_request.yml), make your case, and wait for a maintainer to add the `approved` label and assign it to you.
 
 ## What Gets Accepted
 
@@ -108,4 +108,4 @@ Release tags (`v*`) are owner-managed and can only be created by [@robinebers](h
 
 ## Questions?
 
-Open a [bug report](https://github.com/robinebers/openusage/issues/new?template=bug_report.yml) or [feature request](https://github.com/robinebers/openusage/issues/new?template=feature_request.yml) using the issue templates.
+Open a [bug report](https://github.com/MuhammadAli511/usagedeck-app/issues/new?template=bug_report.yml) or [feature request](https://github.com/MuhammadAli511/usagedeck-app/issues/new?template=feature_request.yml) using the issue templates.

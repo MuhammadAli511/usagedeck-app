@@ -52,7 +52,7 @@ tests land in-slice (repo policy). Estimated source LOC excludes tests.
 
 ### Phase 1 — Account-first core, single account per family (~800 LOC)
 
-- `ProviderAccountsStore` (`openusage.providerAccounts.v1`): account records with id, family,
+- `ProviderAccountsStore` (`usagedeck.providerAccounts.v1`): account records with id, family,
   identityKey, label, sources (+ badge), tombstone. Port from `e052ef9`, dropping the
   shadow-comparison half — the registry is authoritative from day one.
 - Default-home identity reading for Claude and Codex (the proven slice of discovery — **no
@@ -126,9 +126,9 @@ tests land in-slice (repo policy). Estimated source LOC excludes tests.
 ## Verification
 
 - Per phase: `swift build` + full `swift test`; new suites land with their phase.
-- Live: `script/build_and_run.sh`, then `~/Library/Logs/OpenUsage/OpenUsage.log` — discovery trail,
+- Live: `script/build_and_run.sh`, then `~/Library/Logs/UsageDeck/UsageDeck.log` — discovery trail,
   identity resolution, and (Phase 1+) account-registry lines.
 - Beta release per phase via the release-swift skill; soak before the next phase merges.
-- CLI/API: `openusage claude` (alias) and `openusage claude@<hash>` (direct);
+- CLI/API: `usagedeck claude` (alias) and `usagedeck claude@<hash>` (direct);
   `curl 127.0.0.1:6736/v1/usage/claude` echoes the requested id.
 - iCloud: two-machine check once Phase 2 lands (migrated writer + old reader and inverse).
