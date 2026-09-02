@@ -149,11 +149,15 @@ shopt -u nullglob
 # and 26.5) crashes on the Icon Composer `.icon` refractivity feature (Apple regression FB20183399), so
 # CI can't compile it. The committed Assets.car is produced by a working actool via script/compile_icon.sh;
 # regenerate it there whenever assets/AppIcon.icon changes. Fall back to actool where it works (e.g. local).
-if [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/Assets.car" ]; then
+if [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/Assets.car" ] \
+  || [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/AppIcon.icns" ]; then
   echo "==> installing prebuilt app icon"
-  cp "$ROOT_DIR/assets/AppIcon.prebuilt/Assets.car" "$APP_RESOURCES/Assets.car"
-  [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/AppIcon.icns" ] \
-    && cp "$ROOT_DIR/assets/AppIcon.prebuilt/AppIcon.icns" "$APP_RESOURCES/AppIcon.icns"
+  if [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/Assets.car" ]; then
+    cp "$ROOT_DIR/assets/AppIcon.prebuilt/Assets.car" "$APP_RESOURCES/Assets.car"
+  fi
+  if [ -f "$ROOT_DIR/assets/AppIcon.prebuilt/AppIcon.icns" ]; then
+    cp "$ROOT_DIR/assets/AppIcon.prebuilt/AppIcon.icns" "$APP_RESOURCES/AppIcon.icns"
+  fi
 else
   echo "==> compiling app icon"
   xcrun actool "$ROOT_DIR/assets/AppIcon.icon" --compile "$APP_RESOURCES" \
