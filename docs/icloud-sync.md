@@ -40,8 +40,8 @@ Malformed files are ignored and reported in Settings and the app log.
 Apple requires the iCloud container assignment to be present in the provisioning profile embedded in
 the app. UsageDeck uses separate resources so development builds cannot write production history:
 
-- `com.robinebers.usagedeck.dev` uses `iCloud.com.robinebers.usagedeck.dev`.
-- `com.robinebers.usagedeck` uses `iCloud.com.robinebers.usagedeck`.
+- `org.vantaso.usagedeck.dev` uses `iCloud.org.vantaso.usagedeck.dev`.
+- `org.vantaso.usagedeck` uses `iCloud.org.vantaso.usagedeck`.
 
 Create a `MAC_APP_DEVELOPMENT` profile that includes every registered development Mac and a
 `MAC_APP_DIRECT` profile for releases. Install the development profile on each included Mac. The

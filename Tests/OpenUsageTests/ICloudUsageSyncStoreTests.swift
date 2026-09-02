@@ -138,11 +138,11 @@ final class ICloudUsageSyncStoreTests: XCTestCase {
         let keychain = ServiceKeychain()
         let development = KeychainICloudDeviceIDStore(
             keychain: keychain,
-            bundleIdentifier: "com.robinebers.usagedeck.dev"
+            bundleIdentifier: "org.vantaso.usagedeck.dev"
         )
         let production = KeychainICloudDeviceIDStore(
             keychain: keychain,
-            bundleIdentifier: "com.robinebers.usagedeck"
+            bundleIdentifier: "org.vantaso.usagedeck"
         )
 
         try development.writeDeviceID("development-id")

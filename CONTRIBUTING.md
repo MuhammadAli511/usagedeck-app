@@ -99,12 +99,12 @@ Don't open a PR for a feature without an approved issue assigned to you first. [
 
 ## Maintainers
 
-- [@robinebers](https://github.com/robinebers) (lead)
-- [@validatedev](https://github.com/validatedev)
-- [@davidarny](https://github.com/davidarny)
+- [@MuhammadAli511](https://github.com/MuhammadAli511) (lead)
 
-All PRs require approval from at least 2 maintainers before merging.
-Release tags (`v*`) are owner-managed and can only be created by [@robinebers](https://github.com/robinebers).
+Release tags (`v*`) are owner-managed.
+
+UsageDeck is a fork of [OpenUsage](https://github.com/robinebers/openusage). Changes that fix a bug
+present upstream are worth sending there as well, so both projects benefit.
 
 ## Questions?
 

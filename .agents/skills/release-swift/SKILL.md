@@ -38,7 +38,7 @@ Collect commits since the **previous release in the same channel** and categoriz
 Author attribution (required on every entry):
 
 - With a PR number `(#123)`: `gh pr view 123 --json author -q '.author.login'`.
-- Without a PR number: `gh api /repos/robinebers/usagedeck/commits/{full_hash} -q '.author.login'`.
+- Without a PR number: `gh api /repos/MuhammadAli511/usagedeck-app/commits/{full_hash} -q '.author.login'`.
 - If the API returns null, fall back to the git author name.
 
 Output the changelog in a code block (template below) for review.
@@ -92,9 +92,9 @@ Require `isDraft=false`, `isPrerelease=true` for beta or `false` for stable, an 
 ```sh
 tag="v{version}"
 if [ "$(gh release view "$tag" --json isDraft --jq '.isDraft')" = "false" ]; then
-  gh api repos/robinebers/usagedeck/releases --paginate \
+  gh api repos/MuhammadAli511/usagedeck-app/releases --paginate \
     --jq '.[] | select(.draft and .tag_name=="'"$tag"'") | .id' \
-    | xargs -I{} gh api -X DELETE repos/robinebers/usagedeck/releases/{}
+    | xargs -I{} gh api -X DELETE repos/MuhammadAli511/usagedeck-app/releases/{}
 else
   echo "No published release for $tag yet - publish it first; do NOT delete the draft."
 fi

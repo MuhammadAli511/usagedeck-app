@@ -12,9 +12,11 @@ If you find a security vulnerability in UsageDeck, please report it responsibly.
 
 This keeps the report private until a fix is released.
 
-### Alternative: Email
+Reports are handled privately through GitHub. Please do not post vulnerability details in a
+public issue, discussion or pull request.
 
-Send details to [rob@robinebers.com](mailto:rob@robinebers.com) with the subject line "UsageDeck Security Report".
+If the vulnerability is inherited from upstream OpenUsage and affects it too, please also report it
+to [OpenUsage](https://github.com/robinebers/openusage/security) so the fix reaches both projects.
 
 ## What to Include
 
