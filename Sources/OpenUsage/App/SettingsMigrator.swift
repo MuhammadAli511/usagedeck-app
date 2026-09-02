@@ -40,14 +40,14 @@ enum SettingsSchema {
         // - every install gets the known-provider set seeded with the providers of this era, so nothing
         //   already shipped is retroactively treated as "new" and re-enabled against the user's choice.
         SettingsMigration(version: 2) { defaults in
-            if defaults.stringArray(forKey: "openusage.enabledProviders.v1") == nil {
-                let disabled = Set(defaults.stringArray(forKey: "openusage.disabledProviders.v1") ?? [])
+            if defaults.stringArray(forKey: "usagedeck.enabledProviders.v1") == nil {
+                let disabled = Set(defaults.stringArray(forKey: "usagedeck.disabledProviders.v1") ?? [])
                 let enabled = v2ProviderIDs.filter { !disabled.contains($0) }
-                defaults.set(enabled, forKey: "openusage.enabledProviders.v1")
-                defaults.removeObject(forKey: "openusage.disabledProviders.v1")
+                defaults.set(enabled, forKey: "usagedeck.enabledProviders.v1")
+                defaults.removeObject(forKey: "usagedeck.disabledProviders.v1")
             }
-            if defaults.stringArray(forKey: "openusage.knownProviders.v1") == nil {
-                defaults.set(v2ProviderIDs, forKey: "openusage.knownProviders.v1")
+            if defaults.stringArray(forKey: "usagedeck.knownProviders.v1") == nil {
+                defaults.set(v2ProviderIDs, forKey: "usagedeck.knownProviders.v1")
             }
         }
     ]
@@ -70,7 +70,7 @@ enum SettingsSchema {
 enum SettingsMigrator {
     /// Where the applied schema version is recorded, in the same standard domain as the settings it
     /// guards. Integer; absent means "never migrated" — a fresh or legacy install, disambiguated at runtime.
-    static let schemaVersionKey = "openusage.settings.schemaVersion"
+    static let schemaVersionKey = "usagedeck.settings.schemaVersion"
 
     /// Bring the domain up to `current`. Returns the resulting schema version (for logging and tests).
     @discardableResult

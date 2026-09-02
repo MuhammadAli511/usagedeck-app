@@ -4,7 +4,7 @@ import XCTest
 @MainActor
 final class NotificationSettingsStoreTests: XCTestCase {
     func testResetToDefaultsTurnsAllTriggersOffAndPersists() {
-        let suiteName = "OpenUsageTests.notification-settings-reset.\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.notification-settings-reset.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         let store = NotificationSettingsStore(defaults: defaults)

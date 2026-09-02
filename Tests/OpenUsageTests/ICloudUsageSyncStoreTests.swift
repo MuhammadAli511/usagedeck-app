@@ -122,7 +122,7 @@ final class ICloudUsageSyncStoreTests: XCTestCase {
     func testDeviceIdentitySurvivesPreferencesResetThroughKeychainStore() {
         let expectedID = UUID().uuidString.lowercased()
         let firstDefaults = makeDefaults("identity-first")
-        firstDefaults.set(expectedID, forKey: "openusage.icloudSync.deviceID.v1")
+        firstDefaults.set(expectedID, forKey: "usagedeck.icloudSync.deviceID.v1")
         let deviceIDStore = MemoryDeviceIDStore()
 
         let first = makeSync(defaults: firstDefaults, fileStore: RecordingHistoryFileStore(), deviceIDStore: deviceIDStore)
@@ -131,18 +131,18 @@ final class ICloudUsageSyncStoreTests: XCTestCase {
 
         XCTAssertEqual(first.deviceID, expectedID)
         XCTAssertEqual(afterReset.deviceID, expectedID)
-        XCTAssertEqual(resetDefaults.string(forKey: "openusage.icloudSync.deviceID.v1"), expectedID)
+        XCTAssertEqual(resetDefaults.string(forKey: "usagedeck.icloudSync.deviceID.v1"), expectedID)
     }
 
     func testKeychainIdentityIsScopedToDevelopmentAndProductionBundles() throws {
         let keychain = ServiceKeychain()
         let development = KeychainICloudDeviceIDStore(
             keychain: keychain,
-            bundleIdentifier: "com.robinebers.openusage.dev"
+            bundleIdentifier: "com.robinebers.usagedeck.dev"
         )
         let production = KeychainICloudDeviceIDStore(
             keychain: keychain,
-            bundleIdentifier: "com.robinebers.openusage"
+            bundleIdentifier: "com.robinebers.usagedeck"
         )
 
         try development.writeDeviceID("development-id")
@@ -175,7 +175,7 @@ final class ICloudUsageSyncStoreTests: XCTestCase {
     }
 
     private func makeDefaults(_ name: String) -> UserDefaults {
-        let suite = "OpenUsageTests.ICloudSync.\(name).\(UUID().uuidString)"
+        let suite = "UsageDeckTests.ICloudSync.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)
         return defaults

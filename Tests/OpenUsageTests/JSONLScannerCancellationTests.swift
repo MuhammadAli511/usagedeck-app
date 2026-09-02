@@ -156,7 +156,7 @@ final class JSONLScannerCancellationTests: XCTestCase {
 
     private func makeDirectory(_ suffix: String) throws -> URL {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageScannerCancellation\(suffix)-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("UsageDeckScannerCancellation\(suffix)-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
     }

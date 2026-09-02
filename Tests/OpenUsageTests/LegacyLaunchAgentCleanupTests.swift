@@ -5,14 +5,14 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
     // MARK: - Removal decision (pure)
 
     func testRemovalRequiresAProgramInsideTheCurrentAppBundle() {
-        let bundle = "/Applications/OpenUsage.app"
+        let bundle = "/Applications/UsageDeck.app"
         let scenarios: [(name: String, program: String?, bundle: String, remove: Bool)] = [
-            ("legacy lowercase executable", "\(bundle)/Contents/MacOS/openusage", bundle, true),
-            ("current executable", "\(bundle)/Contents/MacOS/OpenUsage", bundle, true),
-            ("foreign executable", "/usr/local/bin/openusage", bundle, false),
+            ("legacy lowercase executable", "\(bundle)/Contents/MacOS/usagedeck", bundle, true),
+            ("current executable", "\(bundle)/Contents/MacOS/UsageDeck", bundle, true),
+            ("foreign executable", "/usr/local/bin/usagedeck", bundle, false),
             ("missing executable", nil, bundle, false),
-            ("unbundled development build", "/Users/dev/.build/OpenUsage", "/Users/dev/.build", false),
-            ("sibling with matching prefix", "\(bundle)2/Contents/MacOS/openusage", bundle, false),
+            ("unbundled development build", "/Users/dev/.build/UsageDeck", "/Users/dev/.build", false),
+            ("sibling with matching prefix", "\(bundle)2/Contents/MacOS/usagedeck", bundle, false),
             ("bundle itself", bundle, bundle, false)
         ]
 
@@ -29,21 +29,21 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
 
     func testParseReadsFirstProgramArgument() throws {
         let agent = try LegacyLaunchAgentCleanup.parse(plistData: plist([
-            "ProgramArguments": ["/Applications/OpenUsage.app/Contents/MacOS/openusage"]
+            "ProgramArguments": ["/Applications/UsageDeck.app/Contents/MacOS/usagedeck"]
         ]))
-        XCTAssertEqual(agent.programPath, "/Applications/OpenUsage.app/Contents/MacOS/openusage")
+        XCTAssertEqual(agent.programPath, "/Applications/UsageDeck.app/Contents/MacOS/usagedeck")
     }
 
     func testParsePrefersProgramKeyOverProgramArguments() throws {
         let agent = try LegacyLaunchAgentCleanup.parse(plistData: plist([
-            "Program": "/Applications/OpenUsage.app/Contents/MacOS/OpenUsage",
+            "Program": "/Applications/UsageDeck.app/Contents/MacOS/UsageDeck",
             "ProgramArguments": ["/somewhere/else"]
         ]))
-        XCTAssertEqual(agent.programPath, "/Applications/OpenUsage.app/Contents/MacOS/OpenUsage")
+        XCTAssertEqual(agent.programPath, "/Applications/UsageDeck.app/Contents/MacOS/UsageDeck")
     }
 
     func testParseWithoutProgramKeysYieldsNil() throws {
-        let agent = try LegacyLaunchAgentCleanup.parse(plistData: plist(["Label": "OpenUsage"]))
+        let agent = try LegacyLaunchAgentCleanup.parse(plistData: plist(["Label": "UsageDeck"]))
         XCTAssertNil(agent.programPath)
     }
 
@@ -55,12 +55,12 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
 
     func testLeftoverTauriAgentFileIsDeleted() throws {
         let agentURL = try writeAgent([
-            "ProgramArguments": ["/Applications/OpenUsage.app/Contents/MacOS/openusage"]
+            "ProgramArguments": ["/Applications/UsageDeck.app/Contents/MacOS/usagedeck"]
         ])
         defer { try? FileManager.default.removeItem(at: agentURL.deletingLastPathComponent()) }
 
         LegacyLaunchAgentCleanup.removeLeftoverAgent(
-            agentURL: agentURL, bundlePath: "/Applications/OpenUsage.app"
+            agentURL: agentURL, bundlePath: "/Applications/UsageDeck.app"
         )
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: agentURL.path))
@@ -73,7 +73,7 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: agentURL.deletingLastPathComponent()) }
 
         LegacyLaunchAgentCleanup.removeLeftoverAgent(
-            agentURL: agentURL, bundlePath: "/Applications/OpenUsage.app"
+            agentURL: agentURL, bundlePath: "/Applications/UsageDeck.app"
         )
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: agentURL.path))
@@ -84,7 +84,7 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: agentURL.deletingLastPathComponent()) }
 
         LegacyLaunchAgentCleanup.removeLeftoverAgent(
-            agentURL: agentURL, bundlePath: "/Applications/OpenUsage.app"
+            agentURL: agentURL, bundlePath: "/Applications/UsageDeck.app"
         )
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: agentURL.path))
@@ -92,11 +92,11 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
 
     func testMissingAgentFileIsANoOp() {
         let agentURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-agent-\(UUID().uuidString)")
-            .appendingPathComponent("OpenUsage.plist")
+            .appendingPathComponent("usagedeck-agent-\(UUID().uuidString)")
+            .appendingPathComponent("UsageDeck.plist")
 
         LegacyLaunchAgentCleanup.removeLeftoverAgent(
-            agentURL: agentURL, bundlePath: "/Applications/OpenUsage.app"
+            agentURL: agentURL, bundlePath: "/Applications/UsageDeck.app"
         )
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: agentURL.path))
@@ -114,9 +114,9 @@ final class LegacyLaunchAgentCleanupTests: XCTestCase {
 
     private func writeRaw(_ data: Data) throws -> URL {
         let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-agent-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-agent-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let url = dir.appendingPathComponent("OpenUsage.plist")
+        let url = dir.appendingPathComponent("UsageDeck.plist")
         try data.write(to: url)
         return url
     }

@@ -1,6 +1,6 @@
 import AppKit
 
-/// Presents the standard macOS About panel for the footer menu's "About OpenUsage" item.
+/// Presents the standard macOS About panel for the footer menu's "About UsageDeck" item.
 ///
 /// As a menu-bar accessory app, OpenUsage is not the active app while the popover is showing, so the
 /// app is activated first — otherwise the panel would open behind whatever app currently owns the
@@ -28,13 +28,16 @@ enum AboutPanel {
 
         let credits = NSMutableAttributedString()
         credits.append(NSAttributedString(string: "Created by ", attributes: base))
+        credits.append(link("Muhammad Ali", "https://muhammad-ali.me", base: base))
+        credits.append(NSAttributedString(string: "\n\nA fork of OpenUsage by ", attributes: base))
         credits.append(link("Robin Ebers", "https://itsbyrob.in/x", base: base))
-        credits.append(NSAttributedString(string: "\nMaintained also by ", attributes: base))
+        credits.append(NSAttributedString(string: ", with ", attributes: base))
         credits.append(link("Mert", "https://github.com/validatedev", base: base))
         credits.append(NSAttributedString(string: " & ", attributes: base))
         credits.append(link("David", "https://github.com/davidarny", base: base))
+        credits.append(NSAttributedString(string: ".\nUsageDeck is not affiliated with or endorsed by OpenUsage.", attributes: base))
         credits.append(NSAttributedString(string: "\n\nOpen source on ", attributes: base))
-        credits.append(link("GitHub", "https://github.com/robinebers/openusage", base: base))
+        credits.append(link("GitHub", "https://github.com/MuhammadAli511/usagedeck-app", base: base))
         return credits
     }
 

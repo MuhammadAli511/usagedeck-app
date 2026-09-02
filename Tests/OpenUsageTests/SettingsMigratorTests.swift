@@ -24,7 +24,7 @@ final class SettingsMigratorTests: XCTestCase {
     func testLegacyInstallMigratesFromZeroAndKeepsSettings() {
         let (defaults, domain) = makeDefaults("Legacy")
         defer { defaults.removePersistentDomain(forName: domain) }
-        defaults.set("custom", forKey: "openusage.layout.v1")  // pre-existing settings, no schema version
+        defaults.set("custom", forKey: "usagedeck.layout.v1")  // pre-existing settings, no schema version
 
         let result = SettingsMigrator.migrate(
             defaults: defaults, domainName: domain, current: 3, migrations: recording(1, 2, 3)
@@ -32,7 +32,7 @@ final class SettingsMigratorTests: XCTestCase {
 
         XCTAssertEqual(result, 3)
         XCTAssertEqual(ranVersions(defaults), [1, 2, 3])
-        XCTAssertEqual(defaults.string(forKey: "openusage.layout.v1"), "custom", "existing settings preserved")
+        XCTAssertEqual(defaults.string(forKey: "usagedeck.layout.v1"), "custom", "existing settings preserved")
     }
 
     // MARK: - Cascading
@@ -133,15 +133,15 @@ final class SettingsMigratorTests: XCTestCase {
         let (defaults, domain) = makeDefaults("NoWipe")
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(true, forKey: "betaUpdatesEnabled")
-        defaults.set("custom", forKey: "openusage.layout.v1")
-        defaults.set(720.0, forKey: "openusage.panelHeight")
+        defaults.set("custom", forKey: "usagedeck.layout.v1")
+        defaults.set(720.0, forKey: "usagedeck.panelHeight")
         defaults.set(SettingsSchema.current, forKey: SettingsMigrator.schemaVersionKey)
 
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)  // real (shipped) schema
 
         XCTAssertTrue(defaults.bool(forKey: "betaUpdatesEnabled"), "Early Access opt-in must survive updates")
-        XCTAssertEqual(defaults.string(forKey: "openusage.layout.v1"), "custom")
-        XCTAssertEqual(defaults.double(forKey: "openusage.panelHeight"), 720.0)
+        XCTAssertEqual(defaults.string(forKey: "usagedeck.layout.v1"), "custom")
+        XCTAssertEqual(defaults.double(forKey: "usagedeck.panelHeight"), 720.0)
     }
 
     /// A legacy install (no schema version) running the real, shipped schema keeps its settings while
@@ -167,16 +167,16 @@ final class SettingsMigratorTests: XCTestCase {
         let (defaults, domain) = makeDefaults("V2Legacy")
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(1, forKey: SettingsMigrator.schemaVersionKey)
-        defaults.set(["devin", "grok"], forKey: "openusage.disabledProviders.v1")
+        defaults.set(["devin", "grok"], forKey: "usagedeck.disabledProviders.v1")
 
         let result = SettingsMigrator.migrate(defaults: defaults, domainName: domain)
 
         XCTAssertEqual(result, SettingsSchema.current)
-        let enabled = Set(defaults.stringArray(forKey: "openusage.enabledProviders.v1") ?? [])
+        let enabled = Set(defaults.stringArray(forKey: "usagedeck.enabledProviders.v1") ?? [])
         XCTAssertEqual(enabled, Set(SettingsSchema.v2ProviderIDs).subtracting(["devin", "grok"]))
-        XCTAssertNil(defaults.stringArray(forKey: "openusage.disabledProviders.v1"), "legacy key removed")
+        XCTAssertNil(defaults.stringArray(forKey: "usagedeck.disabledProviders.v1"), "legacy key removed")
         XCTAssertEqual(
-            Set(defaults.stringArray(forKey: "openusage.knownProviders.v1") ?? []),
+            Set(defaults.stringArray(forKey: "usagedeck.knownProviders.v1") ?? []),
             Set(SettingsSchema.v2ProviderIDs)
         )
 
@@ -193,12 +193,12 @@ final class SettingsMigratorTests: XCTestCase {
         let (defaults, domain) = makeDefaults("V2AllOn")
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(1, forKey: SettingsMigrator.schemaVersionKey)
-        defaults.set("custom", forKey: "openusage.layout.v1")  // some settings, so not a fresh install
+        defaults.set("custom", forKey: "usagedeck.layout.v1")  // some settings, so not a fresh install
 
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
 
         XCTAssertEqual(
-            Set(defaults.stringArray(forKey: "openusage.enabledProviders.v1") ?? []),
+            Set(defaults.stringArray(forKey: "usagedeck.enabledProviders.v1") ?? []),
             Set(SettingsSchema.v2ProviderIDs)
         )
     }
@@ -209,16 +209,16 @@ final class SettingsMigratorTests: XCTestCase {
         let (defaults, domain) = makeDefaults("V2EnabledList")
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(1, forKey: SettingsMigrator.schemaVersionKey)
-        defaults.set(["claude", "cursor"], forKey: "openusage.enabledProviders.v1")
+        defaults.set(["claude", "cursor"], forKey: "usagedeck.enabledProviders.v1")
 
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
 
         XCTAssertEqual(
-            Set(defaults.stringArray(forKey: "openusage.enabledProviders.v1") ?? []),
+            Set(defaults.stringArray(forKey: "usagedeck.enabledProviders.v1") ?? []),
             ["claude", "cursor"]
         )
         XCTAssertEqual(
-            Set(defaults.stringArray(forKey: "openusage.knownProviders.v1") ?? []),
+            Set(defaults.stringArray(forKey: "usagedeck.knownProviders.v1") ?? []),
             Set(SettingsSchema.v2ProviderIDs)
         )
     }
@@ -228,14 +228,14 @@ final class SettingsMigratorTests: XCTestCase {
         let (defaults, domain) = makeDefaults("V2Idempotent")
         defer { defaults.removePersistentDomain(forName: domain) }
         defaults.set(1, forKey: SettingsMigrator.schemaVersionKey)
-        defaults.set(["codex"], forKey: "openusage.disabledProviders.v1")
+        defaults.set(["codex"], forKey: "usagedeck.disabledProviders.v1")
 
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
-        let enabledAfterFirst = defaults.stringArray(forKey: "openusage.enabledProviders.v1")
+        let enabledAfterFirst = defaults.stringArray(forKey: "usagedeck.enabledProviders.v1")
         defaults.set(1, forKey: SettingsMigrator.schemaVersionKey)  // simulate an interrupted upgrade
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
 
-        XCTAssertEqual(defaults.stringArray(forKey: "openusage.enabledProviders.v1"), enabledAfterFirst)
+        XCTAssertEqual(defaults.stringArray(forKey: "usagedeck.enabledProviders.v1"), enabledAfterFirst)
     }
 
     // MARK: - Schema integrity
@@ -260,7 +260,7 @@ final class SettingsMigratorTests: XCTestCase {
     private static let ranKey = "test.ran"
 
     private func makeDefaults(_ name: String) -> (UserDefaults, String) {
-        let suite = "OpenUsageTests.SettingsMigrator.\(name).\(UUID().uuidString)"
+        let suite = "UsageDeckTests.SettingsMigrator.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)
         return (defaults, suite)

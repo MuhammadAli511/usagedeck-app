@@ -47,7 +47,7 @@ final class LocalLimitsAPITests: XCTestCase {
         let creditsJSON = try XCTUnwrap(resources["credits"] as? [String: Any])
 
         XCTAssertEqual(response.status, 200)
-        XCTAssertEqual(root["schema"] as? String, "openusage.limits.v1")
+        XCTAssertEqual(root["schema"] as? String, "usagedeck.limits.v1")
         XCTAssertEqual(root["generatedAt"] as? String, "2026-07-13T01:40:00.000Z")
         XCTAssertEqual(providerJSON["plan"] as? String, "Pro 20x")
         XCTAssertEqual(providerJSON["fetchedAt"] as? String, "2026-07-13T01:39:30.000Z")

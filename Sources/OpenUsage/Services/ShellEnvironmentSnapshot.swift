@@ -39,7 +39,7 @@ struct ShellEnvironmentSnapshot: Codable, Equatable, Sendable {
 /// UserDefaults persistence for the snapshot (`openusage.shellEnvSnapshot.v1`). A class so the
 /// post-launch refresh task can carry it across actors; UserDefaults itself is thread-safe.
 final class ShellEnvironmentSnapshotStore: @unchecked Sendable {
-    static let storageKey = "openusage.shellEnvSnapshot.v1"
+    static let storageKey = "usagedeck.shellEnvSnapshot.v1"
 
     /// The snapshot as it existed at process start, decoded once and memoized (a `static let` is
     /// thread-safe lazy). `ProcessEnvironmentReader` consults this on every identity-key read, so it

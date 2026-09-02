@@ -8,7 +8,7 @@ import Observation
 @MainActor
 @Observable
 final class OnboardingStore {
-    private static let customizeHintPendingKey = "openusage.onboarding.customizeHintPending"
+    private static let customizeHintPendingKey = "usagedeck.onboarding.customizeHintPending"
 
     private(set) var isCustomizeHintPending: Bool
     private let defaults: UserDefaults

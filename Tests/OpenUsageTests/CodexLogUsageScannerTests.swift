@@ -774,7 +774,7 @@ final class CodexLogUsageScannerTests: XCTestCase {
         // so the strip must resolve too. With a link path longer than its target, an unresolved
         // strip overshoots and keys every file to "" — silently dropping all but the first.
         let base = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-codex-symlink-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-codex-symlink-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: base) }
         let real = base.appendingPathComponent("r", isDirectory: true)
         for (relativePath, content) in [

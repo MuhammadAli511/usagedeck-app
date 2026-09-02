@@ -4,7 +4,7 @@ import Foundation
 /// Provider refresh/mapping remains the single source of truth; this edge only selects scalar resources
 /// explicitly declared on `WidgetDescriptor` and gives them stable public names.
 enum LocalLimitsAPI {
-    static let schema = "openusage.limits.v1"
+    static let schema = "usagedeck.limits.v1"
 
     static func encode(providerIDs: [String], state: LocalUsageAPI.State) -> Data {
         var providers: [String: WireProvider] = [:]

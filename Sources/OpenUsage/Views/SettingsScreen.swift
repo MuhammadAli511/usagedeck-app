@@ -113,7 +113,7 @@ struct SettingsScreen: View {
             row("Global Shortcut") {
                 ShortcutRecorderField(name: .togglePopover, isVisible: layout.screen == .settings)
                     .id(shortcutFieldGeneration)
-                    .hoverTooltip("Open OpenUsage from anywhere")
+                    .hoverTooltip("Open UsageDeck from anywhere")
             }
         }
     }
@@ -208,14 +208,14 @@ struct SettingsScreen: View {
                 Toggle("", isOn: $privacy.hideUsageWhileScreenSharing)
                     .settingsSwitchStyle()
             }
-            Text("While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage.")
+            Text("While your screen is shared or recorded, the menu bar shows “UsageDeck” instead of your usage.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(alignment: .center, spacing: 10) {
-                Text("Help make OpenUsage better by sharing anonymous usage analytics")
+                Text("Help make UsageDeck better by sharing anonymous usage analytics")
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Toggle("", isOn: Binding(
@@ -286,8 +286,8 @@ struct SettingsScreen: View {
                         .font(.caption)
                         .foregroundStyle(.orange)
                         .hoverTooltip(notificationsAuth == .denied
-                            ? "Notifications are turned off for OpenUsage. Enable them in System Settings."
-                            : "OpenUsage needs permission to send alerts.")
+                            ? "Notifications are turned off for UsageDeck. Enable them in System Settings."
+                            : "UsageDeck needs permission to send alerts.")
                 }
             }
             .padding(.horizontal, 8)
@@ -387,14 +387,14 @@ struct SettingsScreen: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Text("Adds a global `openusage` command agents can use to monitor limits.")
+            Text("Adds a global `usagedeck` command agents can use to monitor limits.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if commandLineTool.status == .conflict {
-                inlineNotice("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage.")
+                inlineNotice("\(commandLineTool.destinationPath) already exists and wasn't installed by UsageDeck.")
             } else if let errorMessage = commandLineTool.errorMessage {
                 inlineNotice(errorMessage)
             }

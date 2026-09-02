@@ -9,7 +9,7 @@ final class LocalTextFileAccessorTests: XCTestCase {
 
     override func setUpWithError() throws {
         temporaryDirectory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageTests.LocalTextFileAccessor.\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("UsageDeckTests.LocalTextFileAccessor.\(UUID().uuidString)", isDirectory: true)
     }
 
     override func tearDownWithError() throws {

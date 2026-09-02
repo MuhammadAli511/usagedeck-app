@@ -37,7 +37,7 @@ enum LegacyLaunchAgentCleanup {
     /// `tauri-plugin-autostart` named the plist after the app's product name.
     static var defaultAgentURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/LaunchAgents/OpenUsage.plist")
+            .appendingPathComponent("Library/LaunchAgents/UsageDeck.plist")
     }
 
     /// Live entry point, called once per launch. Parameters exist for tests only.

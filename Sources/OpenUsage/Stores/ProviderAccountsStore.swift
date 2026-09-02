@@ -58,7 +58,7 @@ struct ProviderAccountRecord: Codable, Equatable, Sendable {
 /// UI doesn't consult yet; multi-account rendering (Phase 2+) reads cards straight from these records.
 @MainActor
 final class ProviderAccountsStore {
-    static let storageKey = "openusage.providerAccounts.v1"
+    static let storageKey = "usagedeck.providerAccounts.v1"
 
     private let defaults: UserDefaults
     private(set) var records: [ProviderAccountRecord]

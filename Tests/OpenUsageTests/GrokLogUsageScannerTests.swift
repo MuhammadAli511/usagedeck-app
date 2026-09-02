@@ -380,7 +380,7 @@ final class GrokLogUsageScannerTests: XCTestCase {
 enum GrokLogFixture {
     static func makeHome(files: [String: String]) throws -> URL {
         let home = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-grok-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-grok-\(UUID().uuidString)", isDirectory: true)
         let sessions = home.appendingPathComponent("sessions", isDirectory: true)
         try FileManager.default.createDirectory(at: sessions, withIntermediateDirectories: true)
         for (relativePath, contents) in files {
@@ -395,7 +395,7 @@ enum GrokLogFixture {
         GrokLogUsageScanner(
             environment: FakeEnvironment(home.map { ["GROK_HOME": $0.path] } ?? [:]),
             homeDirectory: {
-                FileManager.default.temporaryDirectory.appendingPathComponent("openusage-no-grok-home")
+                FileManager.default.temporaryDirectory.appendingPathComponent("usagedeck-no-grok-home")
             },
             incrementalScanner: IncrementalJSONLScanner<GrokLogUsageScanner.Entry>()
         )

@@ -2,8 +2,8 @@ import Foundation
 
 /// One Mac's presentation-free usage history in the private iCloud container.
 struct UsageHistoryDocument: Hashable, Sendable, Codable, Identifiable {
-    static let currentSchema = "openusage.history.v1"
-    static let accountSchema = "openusage.history.v2"
+    static let currentSchema = "usagedeck.history.v1"
+    static let accountSchema = "usagedeck.history.v2"
 
     var schema: String = currentSchema
     var deviceID: String
@@ -140,7 +140,7 @@ enum UsageHistoryDocumentError: Error, LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedSchema: "This Mac wrote a newer usage-history format. Update OpenUsage."
+        case .unsupportedSchema: "This Mac wrote a newer usage-history format. Update UsageDeck."
         case .invalidDevice: "The synced Mac identity is invalid."
         case .invalidProvider: "The synced provider identifier is invalid."
         case .invalidIdentity: "The synced Claude account identity is invalid."

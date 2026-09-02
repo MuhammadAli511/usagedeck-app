@@ -8,7 +8,7 @@ import XCTest
 final class MenuBarPrivacyStoreTests: XCTestCase {
     /// Isolated, throwaway defaults per test (pattern from `PopoverTransparencyStoreTests`).
     private func makeDefaults(_ name: String) -> UserDefaults {
-        let suiteName = "OpenUsageTests.MenuBarPrivacy.\(name).\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.MenuBarPrivacy.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults

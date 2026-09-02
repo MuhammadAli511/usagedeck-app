@@ -130,9 +130,9 @@ final class PanelHeightController {
 
     private static func heightKey(for screen: PopoverScreen) -> String {
         switch screen {
-        case .dashboard: "openusage.panel.height.dashboard"
-        case .customize: "openusage.panel.height.customize"
-        case .settings: "openusage.panel.height.settings"
+        case .dashboard: "usagedeck.panel.height.dashboard"
+        case .customize: "usagedeck.panel.height.customize"
+        case .settings: "usagedeck.panel.height.settings"
         }
     }
 }

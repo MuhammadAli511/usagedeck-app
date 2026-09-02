@@ -22,9 +22,9 @@ import Observation
 @MainActor
 @Observable
 final class ProviderEnablementStore {
-    private static let disabledStorageKey = "openusage.disabledProviders.v1"
-    private static let enabledStorageKey = "openusage.enabledProviders.v1"
-    private static let knownStorageKey = "openusage.knownProviders.v1"
+    private static let disabledStorageKey = "usagedeck.disabledProviders.v1"
+    private static let enabledStorageKey = "usagedeck.enabledProviders.v1"
+    private static let knownStorageKey = "usagedeck.knownProviders.v1"
 
     /// Posted when the enabled-provider set actually changes. The refresh loop listens for this to wake
     /// early and fetch a newly-enabled provider promptly, instead of waiting out the full interval —

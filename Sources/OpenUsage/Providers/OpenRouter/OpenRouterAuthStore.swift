@@ -21,7 +21,7 @@ enum OpenRouterAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingKey:
-            return "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/openusage/openrouter.json."
+            return "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/usagedeck/openrouter.json."
         case .invalidKey:
             return "OpenRouter API key invalid. Check your key at openrouter.ai/keys."
         case .saveFailed:
@@ -42,7 +42,7 @@ struct OpenRouterAuthStore: Sendable {
     /// Config files checked in order; first readable key wins. JSON (`apiKey` / `api_key` / `key`) or a
     /// plain-text file containing only the key.
     static let configPaths = [
-        "~/.config/openusage/openrouter.json",
+        "~/.config/usagedeck/openrouter.json",
         "~/.config/openrouter/key.json"
     ]
     /// Environment variables checked in order. `OPENROUTER_API_KEY` is the de-facto standard.

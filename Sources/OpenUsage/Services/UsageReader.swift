@@ -90,7 +90,7 @@ public struct UsageReader {
             .filter { providerID, _ in !staleAccountStampIDs.contains(providerID) }
         let savedOrder = LayoutPersistence(
             defaults: defaults,
-            storageKey: "openusage.layout.v1"
+            storageKey: "usagedeck.layout.v1"
         ).loadProviderOrder() ?? []
         let orderedIDs = registry.orderedProviderIDs(savedOrder: savedOrder)
         let enabledOrderedIDs = orderedIDs.filter(includesProvider)

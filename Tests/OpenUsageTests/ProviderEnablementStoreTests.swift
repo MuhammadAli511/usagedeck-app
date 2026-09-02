@@ -133,7 +133,7 @@ final class ProviderEnablementStoreTests: XCTestCase {
         // An existing install (disabled-list mode) must keep its semantics: absent enabled key means
         // everything is on except the explicitly disabled IDs.
         let defaults = makeDefaults("legacy-untouched")
-        defaults.set(["devin"], forKey: "openusage.disabledProviders.v1")
+        defaults.set(["devin"], forKey: "usagedeck.disabledProviders.v1")
         let store = ProviderEnablementStore(defaults: defaults)
 
         XCTAssertNil(store.enabledIDs)
@@ -172,7 +172,7 @@ final class ProviderEnablementStoreTests: XCTestCase {
     }
 
     private func makeDefaults(_ name: String) -> UserDefaults {
-        let suiteName = "OpenUsageTests.Enablement.\(name).\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.Enablement.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults

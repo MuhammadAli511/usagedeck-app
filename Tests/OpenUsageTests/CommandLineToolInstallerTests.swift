@@ -6,8 +6,8 @@ import XCTest
 final class CommandLineToolInstallerTests: XCTestCase {
     private func fixture() throws -> (root: URL, source: String, destination: String) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let source = root.appendingPathComponent("OpenUsage.app/Contents/Helpers/openusage")
-        let destination = root.appendingPathComponent("bin/openusage")
+        let source = root.appendingPathComponent("UsageDeck.app/Contents/Helpers/usagedeck")
+        let destination = root.appendingPathComponent("bin/usagedeck")
         try FileManager.default.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: source)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: source.path)
@@ -80,7 +80,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
         )
         try FileManager.default.createSymbolicLink(
             atPath: fixture.destination,
-            withDestinationPath: "/tmp/another-openusage"
+            withDestinationPath: "/tmp/another-usagedeck"
         )
         var operationRan = false
         let installer = CommandLineToolInstaller(
@@ -97,7 +97,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
         XCTAssertFalse(operationRan)
         XCTAssertEqual(
             try FileManager.default.destinationOfSymbolicLink(atPath: fixture.destination),
-            "/tmp/another-openusage"
+            "/tmp/another-usagedeck"
         )
     }
 }

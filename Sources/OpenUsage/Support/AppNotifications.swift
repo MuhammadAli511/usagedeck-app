@@ -89,9 +89,9 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         // Group all OpenUsage alerts into one stacked thread so simultaneous alerts (e.g. a metric
         // that fires two milestones at once) collapse into a single banner with a "N more" summary
         // instead of separate banners.
-        content.threadIdentifier = "openusage"
+        content.threadIdentifier = "usagedeck"
         if soundEnabled { content.sound = .default }
-        let id = "openusage-\(idPrefix)-\(UUID().uuidString)"
+        let id = "usagedeck-\(idPrefix)-\(UUID().uuidString)"
         let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
         do {
             try await centerProvider().add(request)
@@ -161,7 +161,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         guard response.actionIdentifier == UNNotificationDefaultActionIdentifier,
-              response.notification.request.content.threadIdentifier == "openusage"
+              response.notification.request.content.threadIdentifier == "usagedeck"
         else {
             completionHandler()
             return

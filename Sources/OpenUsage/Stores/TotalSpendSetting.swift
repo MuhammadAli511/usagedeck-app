@@ -6,7 +6,7 @@ import Foundation
 enum TotalSpendSetting {
     static let key = "showTotalSpend"
     /// The card's selected period (Today / Yesterday / 30 Days), persisted by `TotalSpendCard`.
-    static let periodKey = "openusage.totalSpend.period"
+    static let periodKey = "usagedeck.totalSpend.period"
     /// The card's selected metric (Cost / Cost/MTok / Tokens), persisted by `TotalSpendCard`.
-    static let metricKey = "openusage.totalSpend.metric"
+    static let metricKey = "usagedeck.totalSpend.metric"
 }

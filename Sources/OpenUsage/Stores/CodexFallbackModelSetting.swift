@@ -1,7 +1,7 @@
 import Foundation
 
 enum CodexFallbackModelSetting {
-    static let key = "openusage.codex.fallbackModel"
+    static let key = "usagedeck.codex.fallbackModel"
     static let none = ""
 
     static func current(defaults: UserDefaults = .standard) -> String? {

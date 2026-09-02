@@ -4,11 +4,11 @@ import XCTest
 final class CredentialSystemClientIntegrityTests: XCTestCase {
     func testReadTextIfPresentReturnsNilOnlyForMissingFile() throws {
         let missing = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageTests.missing.\(UUID().uuidString)")
+            .appendingPathComponent("UsageDeckTests.missing.\(UUID().uuidString)")
         XCTAssertNil(try LocalTextFileAccessor().readTextIfPresent(missing.path))
 
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageTests.directory.\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("UsageDeckTests.directory.\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         XCTAssertThrowsError(try LocalTextFileAccessor().readTextIfPresent(directory.path))
@@ -17,7 +17,7 @@ final class CredentialSystemClientIntegrityTests: XCTestCase {
     func testSQLiteQueryDoesNotLaunchForMissingDatabase() throws {
         let runner = CredentialCountingProcessRunner()
         let path = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageTests.missing.\(UUID().uuidString).sqlite")
+            .appendingPathComponent("UsageDeckTests.missing.\(UUID().uuidString).sqlite")
 
         XCTAssertNil(
             try SQLiteCLIAccessor(processRunner: runner)
@@ -29,7 +29,7 @@ final class CredentialSystemClientIntegrityTests: XCTestCase {
 
     func testSQLiteQueryOpensExistingDatabaseReadOnly() throws {
         let database = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageTests.existing.\(UUID().uuidString).sqlite")
+            .appendingPathComponent("UsageDeckTests.existing.\(UUID().uuidString).sqlite")
         try Data().write(to: database)
         defer { try? FileManager.default.removeItem(at: database) }
         let runner = CredentialCountingProcessRunner()

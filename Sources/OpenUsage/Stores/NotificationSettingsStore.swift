@@ -12,9 +12,9 @@ import Observation
 final class NotificationSettingsStore {
     private let defaults: UserDefaults
 
-    private static let underTenKey = "openusage.notifications.underTenPercent"
-    private static let healthyToCloseKey = "openusage.notifications.healthyToClose"
-    private static let closeToRunningOutKey = "openusage.notifications.closeToRunningOut"
+    private static let underTenKey = "usagedeck.notifications.underTenPercent"
+    private static let healthyToCloseKey = "usagedeck.notifications.healthyToClose"
+    private static let closeToRunningOutKey = "usagedeck.notifications.closeToRunningOut"
 
     /// Alert the first time a metric drops under 10% remaining for the period.
     var underTenPercent: Bool {

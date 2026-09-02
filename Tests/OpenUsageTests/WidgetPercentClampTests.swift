@@ -53,7 +53,7 @@ final class WidgetPercentClampTests: XCTestCase {
                 lines: [.progress(label: "Metric", used: used, limit: 100, format: .percent)]
             )
         )
-        let suiteName = "OpenUsageTests.PercentClamp.\(suite).\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.PercentClamp.\(suite).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         let cache = ProviderSnapshotCache(userDefaults: defaults, storageKey: "snapshots", ttl: 600, now: { Date() })

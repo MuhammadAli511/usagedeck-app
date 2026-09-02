@@ -29,7 +29,7 @@ struct ProxyConfig: Equatable, Sendable {
     var username: String?
     var password: String?
 
-    static let configPath = "~/.openusage/config.json"
+    static let configPath = "~/.usagedeck/config.json"
 
     /// The app-wide proxy, read from disk exactly once (first use).
     static let current: ProxyConfig? = load(

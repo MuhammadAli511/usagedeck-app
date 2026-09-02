@@ -5,7 +5,7 @@ import XCTest
 final class PopoverTransparencyStoreTests: XCTestCase {
     /// Isolated, throwaway defaults per test (pattern from `RefreshSettingTests`).
     private func makeDefaults(_ name: String) -> UserDefaults {
-        let suiteName = "OpenUsageTests.Transparency.\(name).\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.Transparency.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults

@@ -7,7 +7,7 @@ final class JSONLScanCacheStoreTests: XCTestCase {
 
     override func setUpWithError() throws {
         base = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageCacheTests-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("UsageDeckCacheTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
     }
 

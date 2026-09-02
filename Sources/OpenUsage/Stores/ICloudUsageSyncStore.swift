@@ -23,7 +23,7 @@ struct KeychainICloudDeviceIDStore: ICloudDeviceIDStoring {
 
     init(
         keychain: any KeychainAccessing = SecurityKeychainAccessor(),
-        bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.robinebers.openusage"
+        bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "org.vantaso.usagedeck"
     ) {
         self.keychain = keychain
         self.service = "\(bundleIdentifier).icloud-sync-device-id.v1"
@@ -116,7 +116,7 @@ actor ICloudUsageHistoryFileStore: UsageHistoryFileStoring {
             throw ICloudUsageSyncError.unavailable
         }
         let directory = container
-            .appendingPathComponent("OpenUsage", isDirectory: true)
+            .appendingPathComponent("UsageDeck", isDirectory: true)
             .appendingPathComponent("History", isDirectory: true)
             .appendingPathComponent("v1", isDirectory: true)
         if create {
@@ -150,8 +150,8 @@ actor ICloudUsageHistoryFileStore: UsageHistoryFileStoring {
 @MainActor
 @Observable
 final class ICloudUsageSyncStore {
-    private static let enabledKey = "openusage.icloudSync.enabled.v1"
-    private static let deviceIDKey = "openusage.icloudSync.deviceID.v1"
+    private static let enabledKey = "usagedeck.icloudSync.enabled.v1"
+    private static let deviceIDKey = "usagedeck.icloudSync.deviceID.v1"
 
     private let defaults: UserDefaults
     private let fileStore: any UsageHistoryFileStoring
@@ -315,7 +315,7 @@ final class ICloudUsageSyncStore {
         } catch {
             let id = saved ?? UUID().uuidString.lowercased()
             defaults.set(id, forKey: deviceIDKey)
-            let message = "OpenUsage couldn’t save this Mac’s sync identity in Keychain. "
+            let message = "UsageDeck couldn’t save this Mac’s sync identity in Keychain. "
                 + "Sync may create a duplicate device if app preferences are reset."
             AppLog.warn(.keychain, "iCloud device identity failed: \(error.localizedDescription)")
             return (id, message)

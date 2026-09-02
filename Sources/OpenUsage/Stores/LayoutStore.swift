@@ -113,7 +113,7 @@ final class LayoutStore {
     init(
         registry: WidgetRegistry,
         defaults: UserDefaults = .standard,
-        storageKey: String = "openusage.layout.v1",
+        storageKey: String = "usagedeck.layout.v1",
         defaultMetricIDs: [String] = DefaultLayout.metricIDs,
         migrationBaselineMetricIDs: [String] = DefaultLayout.migrationBaselineMetricIDs,
         defaultPinnedMetricIDs: [String] = DefaultLayout.pinnedMetricIDs,

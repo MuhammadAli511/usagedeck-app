@@ -28,7 +28,7 @@ enum ClaudeLogFixture {
     /// A temp Claude config dir whose `projects/` contains `files` (relative path → JSONL content).
     static func makeHome(files: [String: String] = [:]) throws -> URL {
         let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-claude-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-claude-\(UUID().uuidString)", isDirectory: true)
         try write(files: files, toProjectsOf: root)
         return root
     }
@@ -42,7 +42,7 @@ enum ClaudeLogFixture {
         coworkSessions: [String: [String: String]] = [:]
     ) throws -> URL {
         let home = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-claude-home-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-claude-home-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         if !claudeFiles.isEmpty {
             try write(files: claudeFiles, toProjectsOf: home.appendingPathComponent(".claude"))
@@ -72,7 +72,7 @@ enum ClaudeLogFixture {
     static func scanner(home: URL?) -> ClaudeLogUsageScanner {
         ClaudeLogUsageScanner(
             environment: FakeEnvironment(home.map { ["CLAUDE_CONFIG_DIR": $0.path] } ?? [:]),
-            homeDirectory: { FileManager.default.temporaryDirectory.appendingPathComponent("openusage-no-claude-home") },
+            homeDirectory: { FileManager.default.temporaryDirectory.appendingPathComponent("usagedeck-no-claude-home") },
             incrementalScanner: IncrementalJSONLScanner<ClaudeLogUsageScanner.Entry>()
         )
     }
@@ -126,7 +126,7 @@ enum CodexLogFixture {
     /// (relative path → JSONL content).
     static func makeHome(files: [String: String] = [:]) throws -> URL {
         let root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("openusage-codex-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("usagedeck-codex-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(
             at: root.appendingPathComponent("sessions"), withIntermediateDirectories: true
         )
@@ -142,7 +142,7 @@ enum CodexLogFixture {
     static func scanner(home: URL?) -> CodexLogUsageScanner {
         CodexLogUsageScanner(
             environment: FakeEnvironment(home.map { ["CODEX_HOME": $0.path] } ?? [:]),
-            homeDirectory: { FileManager.default.temporaryDirectory.appendingPathComponent("openusage-no-codex-home") },
+            homeDirectory: { FileManager.default.temporaryDirectory.appendingPathComponent("usagedeck-no-codex-home") },
             incrementalScanner: IncrementalJSONLScanner<CodexLogUsageScanner.Event>()
         )
     }

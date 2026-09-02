@@ -101,7 +101,7 @@ final class StalenessLabelTests: XCTestCase {
         descriptor: WidgetDescriptor,
         runtime: some ProviderRuntime
     ) -> WidgetDataStore {
-        let suiteName = "OpenUsageTests.Staleness.\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.Staleness.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return WidgetDataStore(

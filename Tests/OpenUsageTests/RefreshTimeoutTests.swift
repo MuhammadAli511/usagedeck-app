@@ -90,7 +90,7 @@ final class RefreshTimeoutTests: XCTestCase {
     }
 
     private func makeUserDefaults(_ name: String) -> UserDefaults {
-        let suiteName = "OpenUsageTests.\(name).\(UUID().uuidString)"
+        let suiteName = "UsageDeckTests.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
         return defaults

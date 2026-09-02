@@ -21,7 +21,7 @@ enum ZAIAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingKey:
-            return "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/openusage/zai.json."
+            return "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/usagedeck/zai.json."
         case .invalidKey:
             return "Z.ai API key invalid. Check your key at z.ai/manage-apikey/apikey-list."
         case .saveFailed:
@@ -45,7 +45,7 @@ struct ZAIAuthStore: Sendable {
     /// Config files checked in order; first readable key wins. JSON (`apiKey` / `api_key` / `key`) or a
     /// plain-text file containing only the key.
     static let configPaths = [
-        "~/.config/openusage/zai.json",
+        "~/.config/usagedeck/zai.json",
         "~/.config/zai/key.json"
     ]
     /// Environment variables checked in order. `ZAI_API_KEY` is current; `GLM_API_KEY` is the legacy

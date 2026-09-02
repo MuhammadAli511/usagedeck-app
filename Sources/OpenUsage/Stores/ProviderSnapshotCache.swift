@@ -61,7 +61,7 @@ struct ProviderSnapshotCache {
         // so a launch after an account swap at the same home can discard the previous account's cached
         // limits/plan instead of painting them under the new account's card. Refetch on upgrade so every
         // retained entry carries a stamp from its first write.
-        storageKey: String = "openusage.providerSnapshots.v9",
+        storageKey: String = "usagedeck.providerSnapshots.v9",
         ttl: TimeInterval = RefreshSetting.interval,
         allowsPersistedFreshness: Bool = false,
         now: @escaping () -> Date = Date.init
