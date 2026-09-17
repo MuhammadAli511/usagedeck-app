@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.7.13-beta.1
+
+### New Features
+- Add Codex Swap account support ([#1264](https://github.com/robinebers/openusage/pull/1264)) by @maddada
+
+### Chores
+- Isolate Codex local-spend tests from real pi/OpenCode history ([#1271](https://github.com/robinebers/openusage/pull/1271)) by @manelpb
+- Update PostHog from 3.71.0 to 3.72.0 ([#1249](https://github.com/robinebers/openusage/pull/1249)) by @app/dependabot
+- Record the v0.7.12 changelog by @robinebers
+
+---
+
+### Changelog
+**Full Changelog**: [v0.7.12...v0.7.13-beta.1](https://github.com/robinebers/openusage/compare/v0.7.12...v0.7.13-beta.1)
+
+- [7196244](https://github.com/robinebers/openusage/commit/71962448367c18c05e55bf21ac3a82b367a0912f) docs: changelog for v0.7.12 by @robinebers
+- [7998935](https://github.com/robinebers/openusage/commit/7998935c61b7e387338f28fa4f87f5b1e4d7a6e0) test: isolate Codex local-spend test from real pi/OpenCode history (#1271) by @manelpb
+- [56378e5](https://github.com/robinebers/openusage/commit/56378e5765f85d38ff413036fd984afe3d4664e4) Add Codex Swap account support (#1264) by @maddada
+- [86df736](https://github.com/robinebers/openusage/commit/86df736eb3099cd3f61806bf6c30e4baf967b8f9) chore(deps): bump github.com/posthog/posthog-ios from 3.71.0 to 3.72.0 (#1249) by @app/dependabot
+
 ## v0.7.12
 
 ### New Features
