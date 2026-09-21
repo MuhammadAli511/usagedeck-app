@@ -7,6 +7,8 @@ struct ClaudeAccountCard: Equatable, Sendable {
     let displayName: String
     let usesDesktopCredentials: Bool
     let allowsUnattributedPiUsage: Bool
+    /// Scopes this card's auth store and log scanner when the account is not the default home.
+    var configDir: String? = nil
     var swapAccount: ClaudeSwapAccount? = nil
     var additionalLogDirectories: [String] = []
     var organizationName: String? = nil
@@ -74,6 +76,7 @@ struct ProviderAccountAssembly {
         accountsStore: ProviderAccountsStore,
         families: Set<String> = ProviderAccountID.families,
         desktop: ClaudeDesktopAuthStore? = nil,
+        configDirDiscovery: ClaudeConfigDirDiscovery = .live(),
         listDesktopOrganizationDirectories: @escaping @Sendable (URL) -> [String] = { root in
             let urls = (try? FileManager.default.contentsOfDirectory(
                 at: root, includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
@@ -139,7 +142,33 @@ struct ProviderAccountAssembly {
             }
         }
 
-        if let claudeIdentity = identityKeys["claude"], !claudeIdentity.contains("|"), swapAccounts.isEmpty {
+        var configDirAccounts: [(key: String, fallback: String?, path: String)] = []
+        // Discovery lists the default home first, and that one is already observed above.
+        for dir in configDirDiscovery.discover().dropFirst() {
+            guard case .resolved(let identityKey, let label, let anchor) =
+                observer.observeClaude(configDir: dir.path)
+            else { continue }
+            let source = ProviderAccountSource(
+                kind: .configDir, anchor: anchor, holdsDefaultSource: false
+            )
+            if let index = observations.firstIndex(where: {
+                $0.family == "claude" && $0.identityKey == identityKey
+            }) {
+                observations[index].sources.append(source)
+            } else {
+                observations.append(ProviderAccountsStore.Observation(
+                    family: "claude", identityKey: identityKey, label: label, sources: [source]
+                ))
+            }
+            if !configDirAccounts.contains(where: { $0.key == identityKey }) {
+                configDirAccounts.append(
+                    (key: identityKey, fallback: dir.fallbackLabel, path: dir.path)
+                )
+            }
+        }
+
+        if let claudeIdentity = identityKeys["claude"], !claudeIdentity.contains("|"),
+           swapAccounts.isEmpty, configDirAccounts.isEmpty {
             accountsStore.reconcile(with: observations)
             return ProviderAccountAssembly(identityKeysByCard: identityKeys, codexCards: codexCards)
         }
@@ -174,7 +203,41 @@ struct ProviderAccountAssembly {
         let records = accountsStore.reconcile(with: observations)
         let allowsUnattributedPiUsage = records.count { $0.family == "claude" } == 1
         var cards: [ClaudeAccountCard] = []
-        if let defaultIdentity = defaultClaudeIdentity,
+        // With extra config directories signed in, every account gets a card, the default home
+        // included: it would otherwise render as the single bare `claude` card and hide the rest.
+        if !configDirAccounts.isEmpty {
+            if let defaultIdentity = defaultClaudeIdentity,
+               let record = records.first(where: {
+                   $0.family == "claude" && $0.identityKey == defaultIdentity && !$0.removedTombstone
+               })
+            {
+                cards.append(ClaudeAccountCard(
+                    id: record.id, identityKey: defaultIdentity,
+                    organizationID: organizationID(of: defaultIdentity),
+                    displayName: "Claude",
+                    usesDesktopCredentials: false,
+                    allowsUnattributedPiUsage: allowsUnattributedPiUsage
+                ))
+                identityKeys.removeValue(forKey: "claude")
+                identityKeys[record.id] = defaultIdentity
+            }
+            for account in configDirAccounts where account.key != defaultClaudeIdentity {
+                guard let record = records.first(where: {
+                    $0.family == "claude" && $0.identityKey == account.key && !$0.removedTombstone
+                }), !cards.contains(where: { $0.id == record.id }) else { continue }
+                cards.append(ClaudeAccountCard(
+                    id: record.id, identityKey: account.key,
+                    organizationID: organizationID(of: account.key),
+                    displayName: claudeDisplayName(label: record.label, fallback: account.fallback),
+                    usesDesktopCredentials: false,
+                    allowsUnattributedPiUsage: allowsUnattributedPiUsage,
+                    configDir: account.path
+                ))
+                identityKeys[record.id] = account.key
+            }
+        }
+        if configDirAccounts.isEmpty,
+           let defaultIdentity = defaultClaudeIdentity,
            let organization = defaultIdentity.split(separator: "|").last,
            defaultIdentity.contains("|"),
            let record = records.first(where: {
@@ -195,7 +258,8 @@ struct ProviderAccountAssembly {
         } else if let defaultIdentity = defaultClaudeIdentity,
                   let record = records.first(where: {
                       $0.family == "claude" && $0.identityKey == defaultIdentity && !$0.removedTombstone
-                  }) {
+                  }),
+                  !cards.contains(where: { $0.id == record.id }) {
             // A UUID without an organization remains a default login, separate from scoped cards.
             cards.append(ClaudeAccountCard(
                 id: record.id, identityKey: defaultIdentity, organizationID: nil,
@@ -253,6 +317,42 @@ struct ProviderAccountAssembly {
         var id: String
         var identityKey: String
         var label: String
+    }
+
+    /// The org half of an identity key (`account|org`), empty when the account has no org.
+    private static func organizationID(of identityKey: String) -> String {
+        guard identityKey.contains("|"), let org = identityKey.split(separator: "|").last else {
+            return ""
+        }
+        return String(org)
+    }
+
+    /// Organization name, else the directory name, else plain "Claude".
+    private static func claudeDisplayName(label: String?, fallback: String?) -> String {
+        if let organization = organizationName(from: label) { return "Claude \u{00B7} \(organization)" }
+        if let fallback { return "Claude \u{00B7} \(fallback)" }
+        return "Claude"
+    }
+
+    /// The label is "email (Org)" when both are known and a bare email or org name otherwise, so an
+    /// unparenthesised label is told apart by whether it looks like an address.
+    private static func organizationName(from label: String?) -> String? {
+        guard let label = label?.nilIfEmpty else { return nil }
+        let candidate: String?
+        if let opening = label.lastIndex(of: "("), label.last == ")" {
+            candidate = String(label[label.index(after: opening)..<label.index(before: label.endIndex)])
+                .nilIfEmpty
+        } else {
+            candidate = label.contains("@") ? nil : label
+        }
+        guard let candidate, !isAutoGeneratedOrganizationName(candidate) else { return nil }
+        return candidate
+    }
+
+    /// Claude auto-names a personal org after its owner, which is worse than the directory name.
+    private static func isAutoGeneratedOrganizationName(_ name: String) -> Bool {
+        let lowered = name.lowercased()
+        return lowered.hasSuffix("'s organization") || lowered.hasSuffix("\u{2019}s organization")
     }
 
     private static func organizationLabel(_ value: String?) -> String? {

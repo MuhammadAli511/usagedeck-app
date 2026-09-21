@@ -22,6 +22,7 @@ enum ProviderCatalog {
                 let scanner = ClaudeLogUsageScanner(
                     accountUUID: user, organizationUUID: card.organizationID,
                     allowsUnattributedSessions: card.allowsUnattributedPiUsage,
+                    configDir: card.configDir,
                     additionalConfigDirectories: card.additionalLogDirectories
                 )
                 return ClaudeProvider(
@@ -35,7 +36,8 @@ enum ProviderCatalog {
                         desktopOnly: card.usesDesktopCredentials,
                         swapAccount: card.swapAccount,
                         preferOrganizationScopedDesktop: claudeCards.count > 1
-                            && card.organizationID != nil && !card.usesDesktopCredentials
+                            && card.organizationID != nil && !card.usesDesktopCredentials,
+                        configDir: card.configDir
                     ),
                     logUsageScanner: scanner,
                     allowsUnattributedPiUsage: card.allowsUnattributedPiUsage

@@ -81,6 +81,13 @@ struct DefaultAccountObserver: Sendable {
             }
             configDir = raw
         }
+        return observeClaude(configDir: configDir)
+    }
+
+    /// The same identity read against an explicit config directory, so every directory discovered by
+    /// `ClaudeConfigDirDiscovery` can name its own account. Identity stays strict here too: a
+    /// directory that cannot name its account is reported unresolved, never guessed from its path.
+    func observeClaude(configDir: String) -> Outcome {
         let anchor = expandTilde(configDir)
         // The identity file sits inside a custom config dir, but next to (not inside) the default
         // `~/.claude` — Claude Code keeps the default's state at `~/.claude.json`.

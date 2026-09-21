@@ -52,6 +52,31 @@ A `CLAUDE_CODE_OAUTH_TOKEN` — usually a long-lived `claude setup-token` — ca
 
 If one source holds an expired or "locked out" token, UsageDeck falls back to the others — so signing in again with `claude` outside the app is picked up on the next refresh, without restarting UsageDeck. Claude Code tokens are refreshed automatically; rotated tokens are written back only while the ordered login candidates still match the start of the refresh, so a newly added higher-priority login wins. Claude Desktop tokens are never refreshed or written by UsageDeck.
 
+## Multiple accounts
+
+UsageDeck shows every Claude account you are signed into, each as its own card with its own limits
+and spend.
+
+Claude Code keeps a separate account in each config directory, selected with `CLAUDE_CONFIG_DIR`.
+UsageDeck looks at `~/.claude` and every `~/.claude-<name>` sibling, and treats a directory as an
+account when the keychain holds that directory's credential (Claude Code stores it under
+`Claude Code-credentials-<8 hex of SHA256 of the absolute path>`). Directories that are not
+accounts, such as a worktrees folder or a dated backup, have no such item and are skipped, so
+nothing needs to be configured or excluded by hand.
+
+Cards are named after the account's organization, falling back to the directory name: `~/.claude-work`
+reads "Claude · Work". The default home is always plain "Claude". An organization name that Claude
+generated automatically ("someone@example.com's Organization") is ignored in favour of the directory
+name, since it is longer and less recognisable.
+
+Two directories signed into the same account produce **one** card, not two: accounts are identified
+by their account and organization UUIDs, never by their path, so the same subscription is never
+counted twice. A directory whose `.claude.json` does not name an account is skipped rather than
+guessed at.
+
+Each account refreshes with its own credential and reads spend only from its own `projects/` logs.
+An account with no local logs yet shows its limits with no spend, which is not an error.
+
 ## Claude Swap accounts
 
 UsageDeck discovers the saved accounts in Claude Swap's `~/.claude-swap-backup/sequence.json`
@@ -80,6 +105,7 @@ Local spending includes Claude Swap session histories as well as the default Cla
 history is deduplicated and filtered by its recorded account and organization; entries without account
 ownership stay excluded when multiple accounts are known. Broader SDK and Conductor history
 attribution is outside this change's scope; missing ownership is not inferred from the current login.
+
 
 ## The spend tiles
 

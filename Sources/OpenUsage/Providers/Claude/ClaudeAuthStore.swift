@@ -77,6 +77,9 @@ struct ClaudeAuthStore: Sendable {
     let desktopOnly: Bool
     let swapAccount: ClaudeSwapAccount?
     let preferOrganizationScopedDesktop: Bool
+    /// Pins this store to one config directory so it reads that account's own credential. `nil`
+    /// resolves the default home from the environment.
+    let configDir: String?
 
     init(
         environment: EnvironmentReading = ProcessEnvironmentReader(),
@@ -88,6 +91,7 @@ struct ClaudeAuthStore: Sendable {
         desktopOnly: Bool = false,
         swapAccount: ClaudeSwapAccount? = nil,
         preferOrganizationScopedDesktop: Bool = false,
+        configDir: String? = nil,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
         self.environment = environment
@@ -99,6 +103,7 @@ struct ClaudeAuthStore: Sendable {
         self.desktopOnly = desktopOnly
         self.swapAccount = swapAccount
         self.preferOrganizationScopedDesktop = preferOrganizationScopedDesktop
+        self.configDir = configDir?.nilIfEmpty
         self.now = now
     }
 
@@ -269,7 +274,7 @@ struct ClaudeAuthStore: Sendable {
     }
 
     func claudeHomeOverride() -> String? {
-        swapAccount?.sessionDirectory ?? envText("CLAUDE_CONFIG_DIR")
+        configDir ?? swapAccount?.sessionDirectory ?? envText("CLAUDE_CONFIG_DIR")
     }
 
     // Resolved OAuth endpoint strings before URL validation. The suffix is derived from the same
