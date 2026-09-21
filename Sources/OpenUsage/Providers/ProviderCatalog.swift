@@ -7,6 +7,7 @@ enum ProviderCatalog {
     static func make(
         defaults: UserDefaults = .standard,
         claudeCards: [ClaudeAccountCard] = [],
+        codexCards: [CodexAccountCard] = [],
         claudeIdentityKeys: [String: String] = [:]
     ) -> [ProviderRuntime] {
         // Default provider order (see AGENTS.md "## Providers"): the three established providers first,
@@ -21,7 +22,8 @@ enum ProviderCatalog {
                 let scanner = ClaudeLogUsageScanner(
                     accountUUID: user, organizationUUID: card.organizationID,
                     allowsUnattributedSessions: card.allowsUnattributedPiUsage,
-                    configDir: card.configDir
+                    configDir: card.configDir,
+                    additionalConfigDirectories: card.additionalLogDirectories
                 )
                 return ClaudeProvider(
                     provider: ClaudeProvider.makeProvider(
@@ -32,7 +34,9 @@ enum ProviderCatalog {
                         desktopOrganization: card.organizationID,
                         expectedIdentityKey: identity,
                         desktopOnly: card.usesDesktopCredentials,
-                        preferOrganizationScopedDesktop: claudeCards.count > 1 && !card.usesDesktopCredentials,
+                        swapAccount: card.swapAccount,
+                        preferOrganizationScopedDesktop: claudeCards.count > 1
+                            && card.organizationID != nil && !card.usesDesktopCredentials,
                         configDir: card.configDir
                     ),
                     logUsageScanner: scanner,
@@ -40,13 +44,28 @@ enum ProviderCatalog {
                 )
             }
         }
+        if codexCards.isEmpty {
+            providers.append(CodexProvider())
+        } else {
+            providers += codexCards.map { card in
+                CodexProvider(
+                    provider: CodexProvider.makeProvider(id: card.id, displayName: card.displayName),
+                    authStore: CodexAuthStore(expectedIdentity: card.identity, additionalAuthHomes: card.authHomes),
+                    logUsageScanner: CodexLogUsageScanner(
+                        allowsUnattributedHistory: card.allowsUnattributedHistory,
+                        additionalHomes: card.logHomes
+                    ),
+                    allowsUnattributedHistory: card.allowsUnattributedHistory
+                )
+            }
+        }
         providers += [
-            CodexProvider(),
             CursorProvider(),
             AntigravityProvider(),
             CopilotProvider(defaults: defaults),
             DevinProvider(),
             GrokProvider(),
+            OllamaProvider(),
             OpenCodeProvider(),
             OpenRouterProvider(),
             ZAIProvider()

@@ -15,8 +15,8 @@ This keeps the report private until a fix is released.
 Reports are handled privately through GitHub. Please do not post vulnerability details in a
 public issue, discussion or pull request.
 
-If the vulnerability is inherited from upstream OpenUsage and affects it too, please also report it
-to [OpenUsage](https://github.com/robinebers/openusage/security) so the fix reaches both projects.
+If the vulnerability is inherited from upstream UsageDeck and affects it too, please also report it
+to [UsageDeck](https://github.com/MuhammadAli511/usagedeck-app/security) so the fix reaches both projects.
 
 ## What to Include
 

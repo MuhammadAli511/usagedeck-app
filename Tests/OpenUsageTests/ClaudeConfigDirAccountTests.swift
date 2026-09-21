@@ -13,7 +13,7 @@ final class ClaudeConfigDirAccountTests: XCTestCase {
         return defaults
     }
 
-    func testEachSignedInConfigDirBecomesItsOwnCard() {
+    func testEachSignedInConfigDirBecomesItsOwnCard() async {
         let defaults = makeScratchDefaults()
         let store = ProviderAccountsStore(defaults: defaults)
         let observer = DefaultAccountObserver(
@@ -21,27 +21,27 @@ final class ClaudeConfigDirAccountTests: XCTestCase {
             files: FakeFiles([
                 "/Users/dev/.claude.json":
                     #"{"oauthAccount": {"accountUuid": "ACCT-1", "emailAddress": "me@example.com"}}"#,
-                "/Users/dev/.claude-beaj/.claude.json":
-                    #"{"oauthAccount": {"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "Beaj", "emailAddress": "me@beaj.org"}}"#,
+                "/Users/dev/.claude-work/.claude.json":
+                    #"{"oauthAccount": {"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "Work", "emailAddress": "me@work.example"}}"#,
             ]),
             keychain: FakeKeychain(nil),
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") }
         )
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") },
-            listDirectories: { _ in [".claude", ".claude-beaj"] },
-            // SHA256("/Users/dev/.claude-beaj") starts 0d895ea0
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-0d895ea0": "{}"]),
+            listDirectories: { _ in [".claude", ".claude-work"] },
+            // SHA256("/Users/dev/.claude-work") starts 4298c2ba
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-4298c2ba": "{}"]),
             environment: FakeEnvironment([:])
         )
 
-        let assembly = ProviderAccountAssembly.make(
+        let assembly = await ProviderAccountAssembly.make(
             observer: observer, accountsStore: store, configDirDiscovery: discovery
         )
 
         XCTAssertEqual(
             assembly.claudeCards.map(\.displayName),
-            ["Claude", "Claude · Beaj"]
+            ["Claude", "Claude · Work"]
         )
     }
 
@@ -53,37 +53,37 @@ final class ClaudeConfigDirAccountTests: XCTestCase {
             environment: FakeEnvironment([:]),
             files: FakeFiles(),
             keychain: ServiceKeychain(values: [:]),
-            configDir: "/Users/dev/.claude-beaj"
+            configDir: "/Users/dev/.claude-work"
         )
 
-        // SHA256("/Users/dev/.claude-beaj") starts 0d895ea0
-        XCTAssertEqual(store.keychainServiceCandidates().first, "Claude Code-credentials-0d895ea0")
+        // SHA256("/Users/dev/.claude-work") starts 4298c2ba
+        XCTAssertEqual(store.keychainServiceCandidates().first, "Claude Code-credentials-4298c2ba")
     }
 
     /// The credential FILE has to follow the config directory too. Reading `~/.claude/.credentials.json`
-    /// for an account that lives in `~/.claude-beaj` would attribute one account's usage to another.
+    /// for an account that lives in `~/.claude-work` would attribute one account's usage to another.
     func testAuthStoreScopedToAConfigDirReadsThatDirectorysCredentialFile() {
         let store = ClaudeAuthStore(
             environment: FakeEnvironment([:]),
             files: FakeFiles([
-                "/Users/dev/.claude-beaj/.credentials.json":
-                    #"{"claudeAiOauth":{"accessToken":"beaj-token","subscriptionType":"max"}}"#,
+                "/Users/dev/.claude-work/.credentials.json":
+                    #"{"claudeAiOauth":{"accessToken":"work-token","subscriptionType":"max"}}"#,
                 "/Users/dev/.claude/.credentials.json":
                     #"{"claudeAiOauth":{"accessToken":"default-token","subscriptionType":"pro"}}"#,
             ]),
             keychain: ServiceKeychain(values: [:]),
-            configDir: "/Users/dev/.claude-beaj"
+            configDir: "/Users/dev/.claude-work"
         )
 
         XCTAssertEqual(
             store.loadCredentialCandidates().map(\.oauth.accessToken),
-            ["beaj-token"]
+            ["work-token"]
         )
     }
 
     /// The card is what `ProviderCatalog` turns into a live runtime, so it has to carry the config
     /// directory or the per-account auth store and log scanner have nothing to scope themselves to.
-    func testConfigDirCardCarriesItsDirectoryAndTheDefaultCardDoesNot() {
+    func testConfigDirCardCarriesItsDirectoryAndTheDefaultCardDoesNot() async {
         let defaults = makeScratchDefaults()
         let store = ProviderAccountsStore(defaults: defaults)
         let observer = DefaultAccountObserver(
@@ -91,74 +91,74 @@ final class ClaudeConfigDirAccountTests: XCTestCase {
             files: FakeFiles([
                 "/Users/dev/.claude.json":
                     #"{"oauthAccount": {"accountUuid": "ACCT-1", "emailAddress": "me@example.com"}}"#,
-                "/Users/dev/.claude-beaj/.claude.json":
-                    #"{"oauthAccount": {"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "Beaj"}}"#,
+                "/Users/dev/.claude-work/.claude.json":
+                    #"{"oauthAccount": {"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "Work"}}"#,
             ]),
             keychain: FakeKeychain(nil),
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") }
         )
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") },
-            listDirectories: { _ in [".claude", ".claude-beaj"] },
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-0d895ea0": "{}"]),
+            listDirectories: { _ in [".claude", ".claude-work"] },
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-4298c2ba": "{}"]),
             environment: FakeEnvironment([:])
         )
 
-        let assembly = ProviderAccountAssembly.make(
+        let assembly = await ProviderAccountAssembly.make(
             observer: observer, accountsStore: store, configDirDiscovery: discovery
         )
 
         XCTAssertEqual(
             assembly.claudeCards.map(\.configDir),
-            [nil, "/Users/dev/.claude-beaj"]
+            [nil, "/Users/dev/.claude-work"]
         )
     }
 
     /// The default home is always just "Claude". Titling it with its organization ("Claude \u{00B7} Muhammad
     /// Ali") makes the account you use most read as the odd one out.
-    func testDefaultCardStaysPlainClaudeEvenWhenItsAccountHasAnOrganization() {
-        let cards = makeCards(
+    func testDefaultCardStaysPlainClaudeEvenWhenItsAccountHasAnOrganization() async {
+        let cards = await makeCards(
             defaultAccount:
                 #"{"accountUuid": "ACCT-1", "organizationUuid": "ORG-1", "organizationName": "Muhammad Ali", "emailAddress": "me@example.com"}"#,
             siblingAccount:
-                #"{"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "HeyOz"}"#
+                #"{"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "Acme"}"#
         )
 
-        XCTAssertEqual(cards.map(\.displayName), ["Claude", "Claude \u{00B7} HeyOz"])
+        XCTAssertEqual(cards.map(\.displayName), ["Claude", "Claude \u{00B7} Acme"])
     }
 
     /// Claude hands a personal account an auto-generated organization name like
     /// "someone@example.com's Organization". That is worse than the directory name in every way, so
     /// it is treated as no name at all.
-    func testAutoGeneratedOrganizationNameFallsBackToTheDirectoryName() {
-        let cards = makeCards(
+    func testAutoGeneratedOrganizationNameFallsBackToTheDirectoryName() async {
+        let cards = await makeCards(
             defaultAccount: #"{"accountUuid": "ACCT-1"}"#,
             siblingAccount:
-                #"{"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "beajeducation@gmail.com's Organization"}"#
+                #"{"accountUuid": "ACCT-2", "organizationUuid": "ORG-2", "organizationName": "someone@example.com's Organization"}"#
         )
 
-        XCTAssertEqual(cards.map(\.displayName), ["Claude", "Claude \u{00B7} Beaj"])
+        XCTAssertEqual(cards.map(\.displayName), ["Claude", "Claude \u{00B7} Work"])
     }
 
-    /// Builds the card list for a default home plus one signed-in `~/.claude-beaj`.
-    private func makeCards(defaultAccount: String, siblingAccount: String) -> [ClaudeAccountCard] {
+    /// Builds the card list for a default home plus one signed-in `~/.claude-work`.
+    private func makeCards(defaultAccount: String, siblingAccount: String) async -> [ClaudeAccountCard] {
         let store = ProviderAccountsStore(defaults: makeScratchDefaults())
         let observer = DefaultAccountObserver(
             environment: FakeEnvironment([:]),
             files: FakeFiles([
                 "/Users/dev/.claude.json": #"{"oauthAccount": \#(defaultAccount)}"#,
-                "/Users/dev/.claude-beaj/.claude.json": #"{"oauthAccount": \#(siblingAccount)}"#,
+                "/Users/dev/.claude-work/.claude.json": #"{"oauthAccount": \#(siblingAccount)}"#,
             ]),
             keychain: FakeKeychain(nil),
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") }
         )
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { URL(fileURLWithPath: "/Users/dev") },
-            listDirectories: { _ in [".claude", ".claude-beaj"] },
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-0d895ea0": "{}"]),
+            listDirectories: { _ in [".claude", ".claude-work"] },
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-4298c2ba": "{}"]),
             environment: FakeEnvironment([:])
         )
-        return ProviderAccountAssembly.make(
+        return await ProviderAccountAssembly.make(
             observer: observer, accountsStore: store, configDirDiscovery: discovery
         ).claudeCards
     }

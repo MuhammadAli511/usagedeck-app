@@ -23,15 +23,15 @@ final class ClaudeConfigDirDiscoveryTests: XCTestCase {
         let home = URL(fileURLWithPath: "/Users/test")
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { home },
-            listDirectories: { _ in [".claude", ".claude-beaj"] },
-            // SHA256("/Users/test/.claude-beaj") starts 3d6bf7e7
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-3d6bf7e7": "{}"]),
+            listDirectories: { _ in [".claude", ".claude-work"] },
+            // SHA256("/Users/test/.claude-work")
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-03abf0ee": "{}"]),
             environment: FakeEnvironment()
         )
 
         XCTAssertEqual(
             discovery.discover().map(\.path),
-            ["/Users/test/.claude", "/Users/test/.claude-beaj"]
+            ["/Users/test/.claude", "/Users/test/.claude-work"]
         )
     }
 
@@ -41,27 +41,27 @@ final class ClaudeConfigDirDiscoveryTests: XCTestCase {
             homeDirectory: { home },
             listDirectories: { _ in [] },
             keychain: ServiceKeychain(values: [:]),
-            environment: FakeEnvironment(["CLAUDE_CONFIG_DIR": "/Users/test/.claude-heyoz"])
+            environment: FakeEnvironment(["CLAUDE_CONFIG_DIR": "/Users/test/.claude-other"])
         )
 
-        XCTAssertEqual(discovery.discover().map(\.path), ["/Users/test/.claude-heyoz"])
+        XCTAssertEqual(discovery.discover().map(\.path), ["/Users/test/.claude-other"])
     }
 
     func testDefaultHomeIsListedFirstAndNeverDuplicatedByTheSiblingScan() {
         let home = URL(fileURLWithPath: "/Users/test")
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { home },
-            listDirectories: { _ in [".claude", ".claude-heyoz"] },
+            listDirectories: { _ in [".claude", ".claude-other"] },
             keychain: ServiceKeychain(values: [
                 "Claude Code-credentials-462977e4": "{}",  // SHA256("/Users/test/.claude")
-                "Claude Code-credentials-b57acb03": "{}",  // SHA256("/Users/test/.claude-heyoz")
+                "Claude Code-credentials-2aa53a40": "{}",  // SHA256("/Users/test/.claude-other")
             ]),
-            environment: FakeEnvironment(["CLAUDE_CONFIG_DIR": "/Users/test/.claude-heyoz"])
+            environment: FakeEnvironment(["CLAUDE_CONFIG_DIR": "/Users/test/.claude-other"])
         )
 
         XCTAssertEqual(
             discovery.discover().map(\.path),
-            ["/Users/test/.claude-heyoz", "/Users/test/.claude"]
+            ["/Users/test/.claude-other", "/Users/test/.claude"]
         )
     }
 
@@ -69,14 +69,14 @@ final class ClaudeConfigDirDiscoveryTests: XCTestCase {
         let home = URL(fileURLWithPath: "/Users/test")
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { home },
-            listDirectories: { _ in [".claude", ".claude-beaj"] },
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-3d6bf7e7": "{}"]),
+            listDirectories: { _ in [".claude", ".claude-work"] },
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-03abf0ee": "{}"]),
             environment: FakeEnvironment()
         )
 
         let dirs = discovery.discover()
         XCTAssertNil(dirs[0].fallbackLabel, "the default home is just \"Claude\"")
-        XCTAssertEqual(dirs[1].fallbackLabel, "Beaj")
+        XCTAssertEqual(dirs[1].fallbackLabel, "Work")
     }
 
     /// The safety property the whole design rests on: a `~/.claude*` directory that is not an
@@ -86,15 +86,15 @@ final class ClaudeConfigDirDiscoveryTests: XCTestCase {
         let discovery = ClaudeConfigDirDiscovery(
             homeDirectory: { home },
             listDirectories: { _ in
-                [".claude", ".claude-beaj", ".claude-worktrees", ".claude.bak.20260614-181957"]
+                [".claude", ".claude-work", ".claude-worktrees", ".claude.bak.20260614-181957"]
             },
-            keychain: ServiceKeychain(values: ["Claude Code-credentials-3d6bf7e7": "{}"]),
+            keychain: ServiceKeychain(values: ["Claude Code-credentials-03abf0ee": "{}"]),
             environment: FakeEnvironment()
         )
 
         XCTAssertEqual(
             discovery.discover().map(\.path),
-            ["/Users/test/.claude", "/Users/test/.claude-beaj"]
+            ["/Users/test/.claude", "/Users/test/.claude-work"]
         )
     }
 
@@ -108,6 +108,6 @@ final class ClaudeConfigDirDiscoveryTests: XCTestCase {
     /// Pins the hash convention against a suffix observed in a real macOS keychain, so a change to
     /// the derivation cannot silently stop matching Claude Code's own items.
     func testKeychainSuffixMatchesClaudeCodesOwnDerivation() {
-        XCTAssertEqual(ClaudeConfigDirDiscovery.hashSuffix("/Users/ali/.claude-beaj"), "99ba68ad")
+        XCTAssertEqual(ClaudeConfigDirDiscovery.hashSuffix("/Users/ali/.claude"), "770d9231")
     }
 }
