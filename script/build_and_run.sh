@@ -25,8 +25,8 @@ APP_DISPLAY="UsageDeck"                 # user-facing app name
 BUNDLE_ID="${BUNDLE_ID:-org.vantaso.usagedeck.dev}"
 ICLOUD_CONTAINER_ID="iCloud.org.vantaso.usagedeck.dev"
 MIN_SYSTEM_VERSION="15.0"
-APP_VERSION="0.7.0"
-APP_BUILD="0.7.0"
+APP_VERSION="0.1.0"
+APP_BUILD="0.1.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
