@@ -1,5 +1,5 @@
 {
-  "originHash" : "a196159cee7a748e2082120427575a21686925fd8b480f78e12b27da1a432769",
+  "originHash" : "fac359f80441639b2ccd06dd84496cdf96e36f4b4b177dd291ccd0b023318557",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios.git",
       "state" : {
-        "revision" : "21040ed936870af9933dccb47d7e1572f6ad6293",
-        "version" : "3.97.1"
+        "revision" : "4a6940a043a452db3ff397874ab654a10e63a7c0",
+        "version" : "4.0.2"
       }
     },
     {
